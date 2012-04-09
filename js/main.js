@@ -73,19 +73,69 @@ gamejs.ready(function() {
 		var _drawBlank = function() {
 			draw.rect(ctx, floor_color, rect, 0);
 		};
+		var cagewall_w = 4;
+		var cagewall_left_side = Math.floor(TILE_W/2 - cagewall_w/2);
+		var cagewall_right_side = Math.floor(TILE_W/2 + cagewall_w/2);
+		var cagewall_top_side = Math.floor(TILE_H/2 - cagewall_w/2);
+		var cagewall_bottom_side = Math.floor(TILE_H/2 + cagewall_w/2);
 		var _drawCageCornerTL = function() {
+			// Outer Lines
+			draw.lines(ctx, wall_color, false, [[rect.left + cagewall_left_side, rect.bottom], 
+					   [rect.left + cagewall_left_side, rect.top + cagewall_top_side],
+					   [rect.right, rect.top + cagewall_top_side]], 1);
+
+			// Inner Lines
+			draw.lines(ctx, wall_color, false, [[rect.left + cagewall_right_side, rect.bottom],
+					   [rect.left + cagewall_right_side, rect.top + cagewall_bottom_side],
+					   [rect.right, rect.top + cagewall_bottom_side]], 1);
 		};
 		var _drawCageCornerTR = function() {
+			// Outer Lines
+			draw.lines(ctx, wall_color, false, [[rect.left, rect.top + cagewall_top_side], 
+					   [rect.left + cagewall_right_side, rect.top + cagewall_top_side],
+					   [rect.left + cagewall_right_side, rect.bottom]], 1);
+
+			// Inner Lines
+			draw.lines(ctx, wall_color, false, [[rect.left, rect.top + cagewall_bottom_side], 
+					   [rect.left + cagewall_left_side, rect.top + cagewall_bottom_side],
+					   [rect.left + cagewall_left_side, rect.bottom]], 1);
 		};
 		var _drawCageCornerBL = function() {
+			// Outer Lines
+			draw.lines(ctx, wall_color, false, [[rect.left + cagewall_left_side, rect.top], 
+					   [rect.left + cagewall_left_side, rect.top + cagewall_bottom_side],
+					   [rect.right, rect.top + cagewall_bottom_side]], 1);
+
+			// Inner Lines
+			draw.lines(ctx, wall_color, false, [[rect.left + cagewall_right_side, rect.top], 
+					   [rect.left + cagewall_right_side, rect.top + cagewall_top_side],
+					   [rect.right, rect.top + cagewall_top_side]], 1);
 		};
 		var _drawCageCornerBR = function() {
+			// Outer Lines
+			draw.lines(ctx, wall_color, false, [[rect.left, rect.top + cagewall_bottom_side], 
+					   [rect.left + cagewall_right_side, rect.top + cagewall_bottom_side],
+					   [rect.left + cagewall_right_side, rect.top]], 1);
+
+			// Inner Lines
+			draw.lines(ctx, wall_color, false, [[rect.left, rect.top + cagewall_top_side], 
+					   [rect.left + cagewall_left_side, rect.top + cagewall_top_side],
+					   [rect.left + cagewall_left_side, rect.top]], 1);
 		};
 		var _drawCageWallVert = function() {
+			var left = rect.left + cagewall_left_side;
+			var right = rect.left + cagewall_right_side;
+			draw.line(ctx, wall_color, [left, rect.bottom], [left, rect.top], 1);
+			draw.line(ctx, wall_color, [right, rect.bottom], [right, rect.top], 1);
 		};
 		var _drawCageWallHori = function() {
+			var top = rect.top + cagewall_top_side;
+			var bottom = rect.top + cagewall_bottom_side;
+			draw.line(ctx, wall_color, [rect.left, top], [rect.right, top], 1);
+			draw.line(ctx, wall_color, [rect.left, bottom], [rect.right, bottom], 1);
 		};
 		var _drawCageDoor = function () {
+			draw.line(ctx, "#FFF", [rect.left, rect.center[1]], [rect.right, rect.center[1]], 2);
 		};
 		var _drawWarp = function() {
 		};
@@ -180,7 +230,7 @@ gamejs.ready(function() {
 			dlvl: 0,
 			sublvl: 0,
 			tiles: [],
-			wall_color: '#f00',
+			wall_color: '#00f',
 			floor_color: '#000',
 			dark: false
 		};
