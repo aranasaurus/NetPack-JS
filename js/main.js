@@ -137,8 +137,6 @@ gamejs.ready(function() {
 		var _drawCageDoor = function () {
 			draw.line(ctx, "#FFF", [rect.left, rect.center[1]], [rect.right, rect.center[1]], 2);
 		};
-		var _drawWarp = function() {
-		};
 
 		switch (data) {
 			default: {
@@ -153,7 +151,7 @@ gamejs.ready(function() {
 			case 'w': {
 				I.blocked = false;
 				I.warp = true;
-				I.draw = _drawWarp;
+				I.draw = _drawBlank;
 				break;
 			}
 			case 'l': {
