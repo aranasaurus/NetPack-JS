@@ -6,11 +6,13 @@ var Level = exports.Level = function(I) {
 		dlvl: 0,
 		sublvl: 0,
 		tiles: [],
+		entities: [],
 		wall_color: '#00f',
 		floor_color: '#000',
 		dark: false
 	};
 
+	window.pelletColor = "#944";
 	I.load = function(data) {
 		if (this.dlvl >= 1 && this.dlvl <= 3) {
 			pelletColor = "#944";
@@ -43,6 +45,11 @@ var Level = exports.Level = function(I) {
 			for (var i=0; i<this.tiles.length; i++) {
 				if (this.tiles[i].draw) {
 					this.tiles[i].draw();
+				}
+			}
+			for (var i=0; i<this.entities.length; i++) {
+				if (this.entities[i].draw) {
+					this.entities[i].draw();
 				}
 			}
 		}

@@ -1,3 +1,5 @@
+var entities = require("entities");
+
 var Tile = exports.Tile = function(data, rect, wall_color, floor_color) {
 	var I = {
 		blocked: false,
@@ -130,11 +132,19 @@ var Tile = exports.Tile = function(data, rect, wall_color, floor_color) {
 			break;
 		}
 		case '.': {
-			// TODO: Add Pellets
+			var p = new entities.Pellet({ 
+				pos: rect.center,
+				isPowerPellet: false
+			});
+			loadedLevel.entities.push(p);
 			break;
 		}
 		case 'o': {
-			// TODO: Add Pellets
+			var p = new entities.Pellet({
+				pos: rect.center,
+				isPowerPellet: true
+			});
+			loadedLevel.entities.push(p);
 			break;
 		}
 		case 'B': {

@@ -49,12 +49,11 @@ gamejs.ready(function() {
 
 		f = new font.Font("14px Verdana");
 		statusTxt = f.render("Status Text (HP/XP) goes here.", "#cccccc");
-		lvlTxt = f.render("The Level/Map/Game will be rendered here", "#ccffff");
 		msgTxt = f.render("Game Messages will be printed here", "cccccc");
 
-		var lvl = new level.Level();
-		lvl.load(level_7_9);
-		lvl.draw();
+		window.loadedLevel = new level.Level();
+		loadedLevel.load(level_7_9);
+		loadedLevel.draw();
 
 		ctx.blit(statusTxt, [statusPanel.center().x - (statusTxt.rect.width/2),
 				 statusPanel.center().y - (statusTxt.rect.height/2)]);
