@@ -164,7 +164,12 @@ var Tile = exports.Tile = function(data, rect, wall_color, floor_color) {
 			break;
 		}
 		case '@': {
-			// TODO: Add Player
+			var padding = PLAYER_PADDING;
+			var p = new entities.Player({
+				rect: new gamejs.Rect([rect.left + padding[0], rect.top + padding[1]],
+									  [rect.width - (padding[0]*2), rect.height - (padding[1])])
+			});
+			loadedLevel.entities.push(p);
 			break;
 		}
 	}
