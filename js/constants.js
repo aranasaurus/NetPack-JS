@@ -39,3 +39,4 @@ window.POWER_PELLET_W = 3;
 window.POWER_PELLET_VAL = 50;
 
 window.PLAYER_PADDING = [1, 3];
+window.ROUND_DURATION = 250;

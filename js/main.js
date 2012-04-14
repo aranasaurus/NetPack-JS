@@ -16,7 +16,46 @@ gamejs.ready(function() {
 	window.frameX = Math.floor((SCREEN_W - LVL_W) / 2);
 	window.frameColor = "#fcfcfc";
 
+    function drawGame() {
+    	ctx.fill("#000");
+
+    	drawPanels();
+	};
+
     function tick(msDuration) {
+    	var events = gamejs.event.get();
+    	events.forEach(function(event) {
+    		if (event.type === gamejs.event.KEY_UP) {
+				switch (event.key) {
+					case gamejs.event.K_UP: case gamejs.event.K_k: {
+						gamejs.info("Attempting to move player Up");
+						PLAYER.move_or_attack(0, -TILE_H);
+						break;
+					}
+					case gamejs.event.K_RIGHT: case gamejs.event.K_l: {
+						gamejs.info("Attempting to move player Right");
+						PLAYER.move_or_attack(TILE_W, 0);
+						break;
+					}
+					case gamejs.event.K_DOWN: case gamejs.event.K_j: {
+						gamejs.info("Attempting to move player Down");
+						PLAYER.move_or_attack(0, TILE_H);
+						break;
+					}
+					case gamejs.event.K_LEFT: case gamejs.event.K_h: {
+						gamejs.info("Attempting to move player Left");
+						PLAYER.move_or_attack(-TILE_W, 0);
+						break;
+					}
+				}
+
+				if (PLAYER.moved) {
+					gamejs.info("Player moved");
+				} 
+			}
+		});
+
+		drawGame();
     };
 
     function init() {
@@ -39,21 +78,22 @@ gamejs.ready(function() {
 			borderWidth: FRAME_W
 		});
 
+		f = new font.Font("14px Verdana");
+		window.statusTxt = f.render("Status Text (HP/XP) goes here.", "#cccccc");
+		window.msgTxt = f.render("Game Messages will be printed here", "#cccccc");
+
+		window.loadedLevel = new level.Level();
+		loadedLevel.load(level_7_9);
+		window.canMove = true;
+
 		drawPanels();
 	};
 
 	function drawPanels() {
 		lvlPanel.draw();
+		loadedLevel.draw();
 		statusPanel.draw();
 		msgPanel.draw();
-
-		f = new font.Font("14px Verdana");
-		statusTxt = f.render("Status Text (HP/XP) goes here.", "#cccccc");
-		msgTxt = f.render("Game Messages will be printed here", "#cccccc");
-
-		window.loadedLevel = new level.Level();
-		loadedLevel.load(level_7_9);
-		loadedLevel.draw();
 
 		ctx.blit(statusTxt, [statusPanel.center().x - (statusTxt.rect.width/2),
 				 statusPanel.center().y - (statusTxt.rect.height/2)]);

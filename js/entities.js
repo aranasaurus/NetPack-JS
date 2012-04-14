@@ -7,13 +7,28 @@ var Player = exports.Player = function(I) {
 	I.color = I.color || "yellow";
 	var fontString = (TILE_H) + "px Courier";
 	I.font = I.font || new font.Font(fontString);
+	I.canMove = true;
 	
 	I.draw = function() {
 		ctx.blit(this.font.render("@", this.color), this.rect);
-		console.log("drawing player at " + this.rect.left + ", " + this.rect.top);
 	};
 
 	I.update = function() {
+	};
+
+	I.move_or_attack = function(dx, dy) {
+		// only move once per second
+		this.moved = false;
+		if (this.canMove) {
+			this.rect.moveIp(dx, dy);
+			
+			this.canMove = false;
+			this.moved = true;
+			var self = this;
+			setTimeout(function() {
+				self.canMove = true;
+			}, ROUND_DURATION);
+		}
 	};
 
 	return I;
@@ -48,8 +63,6 @@ var Ghost = exports.Ghost = function(I) {
 			}
 		}
 		ctx.blit(this.font.render(this.name, this.color), this.rect);
-		console.log("drawing Ghost (" + this.name + ") at " + this.rect.left + ", " + this.rect.top);
-
 	};
 
 	return I;

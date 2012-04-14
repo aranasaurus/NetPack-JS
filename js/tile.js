@@ -169,6 +169,7 @@ var Tile = exports.Tile = function(data, rect, wall_color, floor_color) {
 									  [rect.width - (padding[0]*2), rect.height - (padding[1])])
 			});
 			loadedLevel.entities.push(p);
+			window.PLAYER = p;
 			break;
 		}
 	}
