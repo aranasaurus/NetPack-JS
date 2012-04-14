@@ -38,4 +38,4 @@ window.POWER_PELLET_RAD = Math.ceil(TILE_W / 4);
 window.POWER_PELLET_W = 3;
 window.POWER_PELLET_VAL = 50;
 
-window.PLAYER_PADDING = [2, 3];
+window.PLAYER_PADDING = [1, 3];

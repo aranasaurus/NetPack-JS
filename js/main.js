@@ -49,7 +49,7 @@ gamejs.ready(function() {
 
 		f = new font.Font("14px Verdana");
 		statusTxt = f.render("Status Text (HP/XP) goes here.", "#cccccc");
-		msgTxt = f.render("Game Messages will be printed here", "cccccc");
+		msgTxt = f.render("Game Messages will be printed here", "#cccccc");
 
 		window.loadedLevel = new level.Level();
 		loadedLevel.load(level_7_9);

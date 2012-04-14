@@ -80,6 +80,15 @@ var Tile = exports.Tile = function(data, rect, wall_color, floor_color) {
 		draw.line(ctx, "#FFF", [rect.left, rect.center[1]], [rect.right, rect.center[1]], 2);
 	};
 
+	var _makeGhost = function(name) {
+		var padding = PLAYER_PADDING;
+		return new entities.Ghost({
+			name: name,
+			rect: new gamejs.Rect([rect.left + padding[0], rect.top + padding[1]],
+								  [rect.width - (padding[0]*2), rect.height - (padding[1])])
+		});
+	};
+
 	switch (data) {
 		default: {
 			I.draw = _drawBlank;
@@ -147,20 +156,10 @@ var Tile = exports.Tile = function(data, rect, wall_color, floor_color) {
 			loadedLevel.entities.push(p);
 			break;
 		}
-		case 'B': {
-			// TODO: Add Ghosts
-			break;
-		}
-		case 'P': {
-			// TODO: Add Ghosts
-			break;
-		}
-		case 'I': {
-			// TODO: Add Ghosts
-			break;
-		}
-		case 'A': {
-			// TODO: Add Ghosts
+		// Ghosts
+		case 'B': case 'P': case 'I': case 'A': {
+			var g = _makeGhost(data);
+			loadedLevel.entities.push(g);
 			break;
 		}
 		case '@': {
