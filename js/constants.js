@@ -1,5 +1,5 @@
 // Canvas' Screen Dimensions (Max w/h)
-window.SCREEN_W = 800;
+window.SCREEN_W = 600;
 window.SCREEN_H = 600;
 // Panel Border Widths
 window.FRAME_W = 2;
@@ -39,4 +39,3 @@ window.POWER_PELLET_W = 3;
 window.POWER_PELLET_VAL = 50;
 
 window.PLAYER_PADDING = [1, 3];
-window.ROUND_DURATION = 250;

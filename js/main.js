@@ -10,6 +10,8 @@ var level = require('level');
 var entities = require('entities');
 
 gamejs.ready(function() {
+    gamejs.setLogLevel(0);
+
     // TODO: these 3 are a lil stinky... I may want to find a
     // cleaner way to do these. Especially the 2 frame ones.
     window.ctx = gamejs.display.setMode([SCREEN_W, SCREEN_H]);

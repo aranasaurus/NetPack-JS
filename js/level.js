@@ -26,6 +26,9 @@ var Level = exports.Level = function(I) {
 			pelletColor = "rgb(216, 216, 252)";
 		}
 
+		// TODO: I think I'm gonna have to redo this (and all of the x/y related
+		// stuff) as a tile based system to make collision detection and
+		// player/ghost movement make sense.
 		for (var y=0; y < TILE_ROWS; y++) {
 			var yOffset = y * TILE_H + lvlPanel.rect.top;
 			for (var x=0; x < TILE_COLS; x++) {
@@ -37,6 +40,13 @@ var Level = exports.Level = function(I) {
 			}
 		}
 	};
+
+	I.getTile = function(x, y) {
+		var col = (x - lvlPanel.rect.left) / TILE_W;
+		var row = (y - lvlPanel.rect.top) / TILE_H;
+
+		return this.tiles[row * TILE_COLS + col];
+	}
 
 	I.draw = function() {
 		if (this.dark) {

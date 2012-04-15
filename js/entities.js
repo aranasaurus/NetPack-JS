@@ -17,17 +17,10 @@ var Player = exports.Player = function(I) {
 	};
 
 	I.move_or_attack = function(dx, dy) {
-		// only move once per second
 		this.moved = false;
 		if (this.canMove) {
 			this.rect.moveIp(dx, dy);
-			
-			this.canMove = false;
 			this.moved = true;
-			var self = this;
-			setTimeout(function() {
-				self.canMove = true;
-			}, ROUND_DURATION);
 		}
 	};
 
