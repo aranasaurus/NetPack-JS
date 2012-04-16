@@ -18,25 +18,39 @@ GameObject.prototype.draw = function() {
 };
 
 GameObject.prototype.move = function(dRow, dCol) {
-	var targetRow = this.tileIndex[0] + dRow;
-	var targetCol = this.tileIndex[1] + dCol;
+	var targetRow = this.tileIndex[ROW] + dRow;
+	var targetCol = this.tileIndex[COL] + dCol;
+	
+	if (loadedLevel.getTile(this).warp) {
+		gamejs.info('Warp time?');
+		if (this.tileIndex[COL] == 0 && dCol == -1) {
+			gamejs.info('Warping left to right');
+			this.tileIndex[COL] = TILE_COLS - 1;
+			this.moved = true;
+		} else if (this.tileIndex[COL] == TILE_COLS - 1 && dCol == 1) {
+			gamejs.info('Warping right to left');
+			this.tileIndex[COL] = 0;
+			this.moved = true;
+		}
+	}
+
 	if (targetCol >= 0 && targetCol < TILE_COLS && targetRow >= 0 && targetRow < TILE_ROWS) {
 		var targetTile = loadedLevel.tiles[targetRow][targetCol];
-		if (targetTile.warp) {
-			// TODO: Warp!
-		} else {
-			if (!targetTile.blocked) {
-				this.tileIndex[0] = targetRow;
-				this.tileIndex[1] = targetCol;
-				this.moved = true;
-			}
+		if (!targetTile.blocked) {
+			this.tileIndex[ROW] = targetRow;
+			this.tileIndex[COL] = targetCol;
+			this.moved = true;
 		}
+	}
+
+	if (this.moved) {
+		gamejs.info(this.txt + " moved to [" + this.tileIndex[ROW] + ", " + this.tileIndex[COL] + "]");
 	}
 };
 
 GameObject.prototype.updateRect = function() {
 	if (this.moved) {
-		var tileRect = loadedLevel.getRect(this.tileIndex);
+		var tileRect = loadedLevel.getRect(this);
 		var left = tileRect.left + PLAYER_PADDING[0];
 		var top = tileRect.top + PLAYER_PADDING[1];
 		var width = tileRect.width - (PLAYER_PADDING[0] * 2);
@@ -64,22 +78,18 @@ Player.prototype.update = function() {
 		if (event.type === gamejs.event.KEY_UP) {
 			switch (event.key) {
 				case gamejs.event.K_UP: case gamejs.event.K_k: case gamejs.event.K_w: {
-					gamejs.info("Attempting to move player Up");
 					p.move(-1, 0);
 					break;
 				}
 				case gamejs.event.K_RIGHT: case gamejs.event.K_l: case gamejs.event.K_d: {
-					gamejs.info("Attempting to move player Right");
 					p.move(0, 1);
 					break;
 				}
 				case gamejs.event.K_DOWN: case gamejs.event.K_j: case gamejs.event.K_s: {
-					gamejs.info("Attempting to move player Down");
 					p.move(1, 0);
 					break;
 				}
 				case gamejs.event.K_LEFT: case gamejs.event.K_h: case gamejs.event.K_a: {
-					gamejs.info("Attempting to move player Left");
 					p.move(0, -1);
 					break;
 				}
@@ -136,6 +146,6 @@ Pellet.prototype = new GameObject();
 Pellet.prototype.draw = function() {
 	var rad = this.isPowerPellet ? POWER_PELLET_RAD : PELLET_RAD;
 	var width = this.isPowerPellet ? POWER_PELLET_W : PELLET_W;
-	draw.circle(ctx, this.color, loadedLevel.getRect(this.tileIndex).center, rad, width);
+	draw.circle(ctx, this.color, loadedLevel.getRect(this).center, rad, width);
 }
 

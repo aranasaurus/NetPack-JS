@@ -15,11 +15,17 @@ var Level = exports.Level = function() {
 	return this;
 };
 
-Level.prototype.getRect = function(tileIndex) {
-	return this.tiles[tileIndex[0]][tileIndex[1]].rect;
+Level.prototype.getRect = function(entityOrTileIndex) {
+	var tileIndex = entityOrTileIndex.tileIndex || entityOrTileIndex;
+	return this.tiles[tileIndex[ROW]][tileIndex[COL]].rect;
 };
 
-Level.prototype.getTile = function(xy) {
+Level.prototype.getTile = function(entityOrTileIndex) {
+	var tileIndex = entityOrTileIndex.tileIndex || entityOrTileIndex;
+	return this.tiles[tileIndex[ROW]][tileIndex[COL]];
+};
+
+Level.prototype.getTileAtXY = function(xy) {
 	var col = (xy[0] - lvlPanel.left) / TILE_W;
 	var row = (xy[1] - lvlPanel.top) / TILE_H;
 

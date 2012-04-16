@@ -21,6 +21,10 @@ window.TILE_ROWS = 21;
 window.TILE_W = Math.ceil(lvl_width_px / TILE_COLS);
 window.TILE_H = Math.ceil(lvl_height_px / TILE_ROWS);
 
+// TileIndex Indices
+window.ROW = 0;
+window.COL = 1;
+
 // Level Panel Dimensions
 window.LVL_W = TILE_W * TILE_COLS;
 window.LVL_H = TILE_H * TILE_ROWS;
