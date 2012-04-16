@@ -1,179 +1,144 @@
 var entities = require("entities");
 
-var Tile = exports.Tile = function(data, rect, wall_color, floor_color) {
-	var I = {
-		blocked: false,
-		warp: false,
-		explored: false,
-		data: data,
-		rect: rect
-	};
+var Tile = exports.Tile = function(data, rect, wallColor, floorColor) {
+	this.blocked = false;
+	this.warp = false;
+	this.explored = false;
+	this.data = data;
+	this.rect = rect;
+	this.wallColor = wallColor;
+	this.floorColor = floorColor;
 
-	var _drawBlock = function() {
-		draw.rect(ctx, wall_color, rect, 0);
-	};
-	var _drawBlank = function() {
-		draw.rect(ctx, floor_color, rect, 0);
-	};
-	var cagewall_w = 4;
-	var cagewall_left_side = Math.floor(TILE_W/2 - cagewall_w/2);
-	var cagewall_right_side = Math.floor(TILE_W/2 + cagewall_w/2);
-	var cagewall_top_side = Math.floor(TILE_H/2 - cagewall_w/2);
-	var cagewall_bottom_side = Math.floor(TILE_H/2 + cagewall_w/2);
-	var _drawCageCornerTL = function() {
-		// Outer Lines
-		draw.lines(ctx, wall_color, false, [[rect.left + cagewall_left_side, rect.bottom], 
-				   [rect.left + cagewall_left_side, rect.top + cagewall_top_side],
-				   [rect.right, rect.top + cagewall_top_side]], 1);
-
-				   // Inner Lines
-				   draw.lines(ctx, wall_color, false, [[rect.left + cagewall_right_side, rect.bottom],
-							  [rect.left + cagewall_right_side, rect.top + cagewall_bottom_side],
-							  [rect.right, rect.top + cagewall_bottom_side]], 1);
-	};
-	var _drawCageCornerTR = function() {
-		// Outer Lines
-		draw.lines(ctx, wall_color, false, [[rect.left, rect.top + cagewall_top_side], 
-				   [rect.left + cagewall_right_side, rect.top + cagewall_top_side],
-				   [rect.left + cagewall_right_side, rect.bottom]], 1);
-
-				   // Inner Lines
-				   draw.lines(ctx, wall_color, false, [[rect.left, rect.top + cagewall_bottom_side], 
-							  [rect.left + cagewall_left_side, rect.top + cagewall_bottom_side],
-							  [rect.left + cagewall_left_side, rect.bottom]], 1);
-	};
-	var _drawCageCornerBL = function() {
-		// Outer Lines
-		draw.lines(ctx, wall_color, false, [[rect.left + cagewall_left_side, rect.top], 
-				   [rect.left + cagewall_left_side, rect.top + cagewall_bottom_side],
-				   [rect.right, rect.top + cagewall_bottom_side]], 1);
-
-				   // Inner Lines
-				   draw.lines(ctx, wall_color, false, [[rect.left + cagewall_right_side, rect.top], 
-							  [rect.left + cagewall_right_side, rect.top + cagewall_top_side],
-							  [rect.right, rect.top + cagewall_top_side]], 1);
-	};
-	var _drawCageCornerBR = function() {
-		// Outer Lines
-		draw.lines(ctx, wall_color, false, [[rect.left, rect.top + cagewall_bottom_side], 
-				   [rect.left + cagewall_right_side, rect.top + cagewall_bottom_side],
-				   [rect.left + cagewall_right_side, rect.top]], 1);
-
-				   // Inner Lines
-				   draw.lines(ctx, wall_color, false, [[rect.left, rect.top + cagewall_top_side], 
-							  [rect.left + cagewall_left_side, rect.top + cagewall_top_side],
-							  [rect.left + cagewall_left_side, rect.top]], 1);
-	};
-	var _drawCageWallVert = function() {
-		var left = rect.left + cagewall_left_side;
-		var right = rect.left + cagewall_right_side;
-		draw.line(ctx, wall_color, [left, rect.bottom], [left, rect.top], 1);
-		draw.line(ctx, wall_color, [right, rect.bottom], [right, rect.top], 1);
-	};
-	var _drawCageWallHori = function() {
-		var top = rect.top + cagewall_top_side;
-		var bottom = rect.top + cagewall_bottom_side;
-		draw.line(ctx, wall_color, [rect.left, top], [rect.right, top], 1);
-		draw.line(ctx, wall_color, [rect.left, bottom], [rect.right, bottom], 1);
-	};
-	var _drawCageDoor = function () {
-		draw.line(ctx, "#FFF", [rect.left, rect.center[1]], [rect.right, rect.center[1]], 2);
-	};
-
-	var _makeGhost = function(name) {
-		var padding = PLAYER_PADDING;
-		return new entities.Ghost({
-			name: name,
-			rect: new gamejs.Rect([rect.left + padding[0], rect.top + padding[1]],
-								  [rect.width - (padding[0]*2), rect.height - (padding[1])])
-		});
-	};
-
+	this.cagewall_w = 4;
+	this.cagewall_left_side = Math.floor(TILE_W/2 - this.cagewall_w/2);
+	this.cagewall_right_side = Math.floor(TILE_W/2 + this.cagewall_w/2);
+	this.cagewall_top_side = Math.floor(TILE_H/2 - this.cagewall_w/2);
+	this.cagewall_bottom_side = Math.floor(TILE_H/2 + this.cagewall_w/2);
 	switch (data) {
 		default: {
-			I.draw = _drawBlank;
-			break;
-		}
-		case '1': {
-			I.blocked = true;
-			I.draw = _drawBlock;
+			// Use defaults
 			break;
 		}
 		case 'w': {
-			I.blocked = false;
-			I.warp = true;
-			I.draw = _drawBlank;
+			this.warp = true;
 			break;
 		}
-		case 'l': {
-			I.blocked = true;
-			I.draw = _drawCageCornerTL;
-			break;
-		}
-		case 'r': {
-			I.blocked = true;
-			I.draw = _drawCageCornerTR;
-			break;
-		}
-		case 'L': {
-			I.blocked = true;
-			I.draw = _drawCageCornerBL;
-			break;
-		}
-		case 'R': {
-			I.blocked = true;
-			I.draw = _drawCageCornerBR;
-			break;
-		}
-		case '=': {
-			I.blocked = true;
-			I.draw = _drawCageWallHori;
-			break;
-		}
-		case 'v': {
-			I.blocked = true;
-			I.draw = _drawCageWallVert;
-			break;
-		}
-		case '-': {
-			I.blocked = true;
-			I.draw = _drawCageDoor;
-			break;
-		}
-		case '.': {
-			var p = new entities.Pellet({ 
-				pos: rect.center,
-				isPowerPellet: false
-			});
-			loadedLevel.entities.push(p);
-			break;
-		}
-		case 'o': {
-			var p = new entities.Pellet({
-				pos: rect.center,
-				isPowerPellet: true
-			});
-			loadedLevel.entities.push(p);
-			break;
-		}
-		// Ghosts
-		case 'B': case 'P': case 'I': case 'A': {
-			var g = _makeGhost(data);
-			loadedLevel.entities.push(g);
-			break;
-		}
-		case '@': {
-			var padding = PLAYER_PADDING;
-			var p = new entities.Player({
-				rect: new gamejs.Rect([rect.left + padding[0], rect.top + padding[1]],
-									  [rect.width - (padding[0]*2), rect.height - (padding[1])])
-			});
-			loadedLevel.entities.push(p);
-			window.PLAYER = p;
+		case '1': case 'l': case 'r': case 'L': case 'R': case '=': case 'v': case '-': {
+			this.blocked = true;
 			break;
 		}
 	}
 
-	return I;
+	return this;
 };
 
+Tile.prototype._drawBlock = function() {
+	draw.rect(ctx, this.wallColor, this.rect, 0);
+};
+Tile.prototype._drawBlank = function() {
+	draw.rect(ctx, this.floorColor, this.rect, 0);
+};
+Tile.prototype._drawCageCornerTL = function() {
+	// Outer Lines
+	draw.lines(ctx, this.wallColor, false, [[this.rect.left + this.cagewall_left_side, this.rect.bottom], 
+			   [this.rect.left + this.cagewall_left_side, this.rect.top + this.cagewall_top_side],
+			   [this.rect.right, this.rect.top + this.cagewall_top_side]], 1);
+
+	// Inner Lines
+	draw.lines(ctx, this.wallColor, false, [[this.rect.left + this.cagewall_right_side, this.rect.bottom],
+			   [this.rect.left + this.cagewall_right_side, this.rect.top + this.cagewall_bottom_side],
+			   [this.rect.right, this.rect.top + this.cagewall_bottom_side]], 1);
+};
+Tile.prototype._drawCageCornerTR = function() {
+	// Outer Lines
+	draw.lines(ctx, this.wallColor, false, [[this.rect.left, this.rect.top + this.cagewall_top_side], 
+			   [this.rect.left + this.cagewall_right_side, this.rect.top + this.cagewall_top_side],
+			   [this.rect.left + this.cagewall_right_side, this.rect.bottom]], 1);
+
+	// Inner Lines
+	draw.lines(ctx, this.wallColor, false, [[this.rect.left, this.rect.top + this.cagewall_bottom_side], 
+			   [this.rect.left + this.cagewall_left_side, this.rect.top + this.cagewall_bottom_side],
+			   [this.rect.left + this.cagewall_left_side, this.rect.bottom]], 1);
+};
+Tile.prototype._drawCageCornerBL = function() {
+	// Outer Lines
+	draw.lines(ctx, this.wallColor, false, [[this.rect.left + this.cagewall_left_side, this.rect.top], 
+			   [this.rect.left + this.cagewall_left_side, this.rect.top + this.cagewall_bottom_side],
+			   [this.rect.right, this.rect.top + this.cagewall_bottom_side]], 1);
+
+	// Inner Lines
+	draw.lines(ctx, this.wallColor, false, [[this.rect.left + this.cagewall_right_side, this.rect.top], 
+			   [this.rect.left + this.cagewall_right_side, this.rect.top + this.cagewall_top_side],
+			   [this.rect.right, this.rect.top + this.cagewall_top_side]], 1);
+};
+Tile.prototype._drawCageCornerBR = function() {
+	// Outer Lines
+	draw.lines(ctx, this.wallColor, false, [[this.rect.left, this.rect.top + this.cagewall_bottom_side], 
+			   [this.rect.left + this.cagewall_right_side, this.rect.top + this.cagewall_bottom_side],
+			   [this.rect.left + this.cagewall_right_side, this.rect.top]], 1);
+
+	// Inner Lines
+	draw.lines(ctx, this.wallColor, false, [[this.rect.left, this.rect.top + this.cagewall_top_side], 
+			   [this.rect.left + this.cagewall_left_side, this.rect.top + this.cagewall_top_side],
+			   [this.rect.left + this.cagewall_left_side, this.rect.top]], 1);
+};
+Tile.prototype._drawCageWallVert = function() {
+	var left = this.rect.left + this.cagewall_left_side;
+	var right = this.rect.left + this.cagewall_right_side;
+	draw.line(ctx, this.wallColor, [left, this.rect.bottom], [left, this.rect.top], 1);
+	draw.line(ctx, this.wallColor, [right, this.rect.bottom], [right, this.rect.top], 1);
+};
+Tile.prototype._drawCageWallHori = function() {
+	var top = this.rect.top + this.cagewall_top_side;
+	var bottom = this.rect.top + this.cagewall_bottom_side;
+	draw.line(ctx, this.wallColor, [this.rect.left, top], [this.rect.right, top], 1);
+	draw.line(ctx, this.wallColor, [this.rect.left, bottom], [this.rect.right, bottom], 1);
+};
+Tile.prototype._drawCageDoor = function () {
+	draw.line(ctx, "#FFF", [this.rect.left, this.rect.center[1]], [this.rect.right, this.rect.center[1]], 2);
+};
+
+Tile.prototype.draw = function() {
+	switch (this.data) {
+		default: {
+			this._drawBlank();
+			break;
+		}
+		case '1': {
+			this._drawBlock();
+			break;
+		}
+		case 'w': {
+			this._drawBlank();
+			break;
+		}
+		case 'l': {
+			this._drawCageCornerTL();
+			break;
+		}
+		case 'r': {
+			this._drawCageCornerTR();
+			break;
+		}
+		case 'L': {
+			this._drawCageCornerBL();
+			break;
+		}
+		case 'R': {
+			this._drawCageCornerBR();
+			break;
+		}
+		case '=': {
+			this._drawCageWallHori();
+			break;
+		}
+		case 'v': {
+			this._drawCageWallVert();
+			break;
+		}
+		case '-': {
+			this._drawCageDoor();
+			break;
+		}
+	}
+}

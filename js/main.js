@@ -18,63 +18,38 @@ gamejs.ready(function() {
 	window.frameX = Math.floor((SCREEN_W - LVL_W) / 2);
 	window.frameColor = "#fcfcfc";
 
-    function drawGame() {
-    	ctx.fill("#000");
-
-    	drawPanels();
-	};
-
     function tick(msDuration) {
-    	var events = gamejs.event.get();
-    	events.forEach(function(event) {
-    		if (event.type === gamejs.event.KEY_UP) {
-				switch (event.key) {
-					case gamejs.event.K_UP: case gamejs.event.K_k: {
-						gamejs.info("Attempting to move player Up");
-						PLAYER.move_or_attack(0, -TILE_H);
-						break;
-					}
-					case gamejs.event.K_RIGHT: case gamejs.event.K_l: {
-						gamejs.info("Attempting to move player Right");
-						PLAYER.move_or_attack(TILE_W, 0);
-						break;
-					}
-					case gamejs.event.K_DOWN: case gamejs.event.K_j: {
-						gamejs.info("Attempting to move player Down");
-						PLAYER.move_or_attack(0, TILE_H);
-						break;
-					}
-					case gamejs.event.K_LEFT: case gamejs.event.K_h: {
-						gamejs.info("Attempting to move player Left");
-						PLAYER.move_or_attack(-TILE_W, 0);
-						break;
-					}
-				}
 
-				if (PLAYER.moved) {
-					gamejs.info("Player moved");
-				} 
+		// Update stuff
+		loadedLevel.gameObjects.forEach(function(entity) {
+			if (entity.update) {
+				entity.update();
 			}
 		});
 
-		drawGame();
+		// Draw stuff
+    	ctx.fill("#000");
+    	drawPanels();
     };
 
     function init() {
     	draw.rect(ctx, "#000", new gamejs.Rect([0,0], [SCREEN_W, SCREEN_H]), 0);
     	
 		// Set up the 3 main panels of the game
-		window.statusPanel = new panel.Panel("status", {
+		window.statusPanel = new panel.Panel({
+			name: "status", 
 			rect: new gamejs.Rect([frameX, V_PAD], [STATUS_W, STATUS_H]),
 			color: frameColor,
 			borderWidth: FRAME_W
 		});
-		window.lvlPanel = new panel.Panel("lvl", {
+		window.lvlPanel = new panel.Panel({
+			name: "lvl", 
 			rect: new gamejs.Rect([frameX, statusPanel.rect.bottom + V_PAD], [LVL_W, LVL_H]),
 			color: "#000",
 			borderWidth: 0
 		});
-		window.msgPanel = new panel.Panel("messages", {
+		window.msgPanel = new panel.Panel({
+			name: "messages", 
 			rect: new gamejs.Rect([frameX, lvlPanel.rect.bottom + V_PAD], [MSG_W, MSG_H]),
 			color: frameColor,
 			borderWidth: FRAME_W
@@ -86,9 +61,8 @@ gamejs.ready(function() {
 
 		window.loadedLevel = new level.Level();
 		loadedLevel.load(level_7_9);
-		window.canMove = true;
 
-		drawPanels();
+		gamejs.time.fpsCallback(tick, this, FPS);
 	};
 
 	function drawPanels() {
@@ -97,12 +71,11 @@ gamejs.ready(function() {
 		statusPanel.draw();
 		msgPanel.draw();
 
-		ctx.blit(statusTxt, [statusPanel.center().x - (statusTxt.rect.width/2),
-				 statusPanel.center().y - (statusTxt.rect.height/2)]);
-		ctx.blit(msgTxt, [msgPanel.center().x - (msgTxt.rect.width/2),
-				 msgPanel.center().y - (msgTxt.rect.height/2)]);
+		ctx.blit(statusTxt, [statusPanel.rect.center[0] - (statusTxt.rect.width/2),
+				 statusPanel.rect.center[1] - (statusTxt.rect.height/2)]);
+		ctx.blit(msgTxt, [msgPanel.rect.center[0] - (msgTxt.rect.width/2),
+				 msgPanel.rect.center[1] - (msgTxt.rect.height/2)]);
 	};
 
     init();
-    gamejs.time.fpsCallback(tick, this, 24);
 });

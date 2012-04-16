@@ -1,70 +1,96 @@
 var tile = require("tile");
+var entities = require("entities");
 
-var Level = exports.Level = function(I) { 
-	var I = I || {
-		name: '',
-		dlvl: 0,
-		sublvl: 0,
-		tiles: [],
-		entities: [],
-		wall_color: '#00f',
-		floor_color: '#000',
-		dark: false
-	};
+var Level = exports.Level = function() { 
+	this.name = '';
+	this.dlvl = 0;
+	this.sublvl = 0;
+	this.tiles = [];
+	this.gameObjects = [];
+	this.wallColor = "#00f";
+	this.floorColor = "#000";
+	this.dark = false;
+	this.pelletColor = "#944";
 
-	window.pelletColor = "#944";
-	I.load = function(data) {
-		if (this.dlvl >= 1 && this.dlvl <= 3) {
-			pelletColor = "#944";
-		} else if (this.dlvl >= 4 && this.dlvl <= 6) {
-			pelletColor = "rgb(216, 216, 252)";
-		} else if (this.dlvl >= 7 && this.dlvl <= 9) {
-			pelletColor = "#f00";
-		} else if (this.dlvl >= 10 && this.dlvl <= 12) {
-			pelletColor = "#0ff";
-		} else if (this.dlvl >= 13) {
-			pelletColor = "rgb(216, 216, 252)";
-		}
+	return this;
+};
 
-		// TODO: I think I'm gonna have to redo this (and all of the x/y related
-		// stuff) as a tile based system to make collision detection and
-		// player/ghost movement make sense.
-		for (var y=0; y < TILE_ROWS; y++) {
-			var yOffset = y * TILE_H + lvlPanel.rect.top;
-			for (var x=0; x < TILE_COLS; x++) {
-				var xOffset = x * TILE_W + lvlPanel.rect.left;
-				var rect = new gamejs.Rect([xOffset, yOffset], [TILE_W, TILE_H]);
+Level.prototype.getRect = function(tileIndex) {
+	return this.tiles[tileIndex[0]][tileIndex[1]].rect;
+};
 
-				var t = new tile.Tile(data[y][x], rect, this.wall_color, this.floor_color);
-				this.tiles.push(t);
-			}
-		}
-	};
+Level.prototype.getTile = function(xy) {
+	var col = (xy[0] - lvlPanel.left) / TILE_W;
+	var row = (xy[1] - lvlPanel.top) / TILE_H;
 
-	I.getTile = function(x, y) {
-		var col = (x - lvlPanel.rect.left) / TILE_W;
-		var row = (y - lvlPanel.rect.top) / TILE_H;
+	return this.tiles[row][col];
+};
 
-		return this.tiles[row * TILE_COLS + col];
+Level.prototype.draw = function() {
+	if (this.dark) {
+		// TODO: Implement Dark mode
+	} else {
+		this.tiles.forEach(function(row) {
+			row.forEach(function(col) {
+				col.draw();
+			});
+		});
+		this.gameObjects.forEach(function(entity) {
+			entity.draw();
+		});
+	}
+}
+
+Level.prototype.load = function(data) {
+	gamejs.info("Loading map data...");
+	if (this.dlvl >= 1 && this.dlvl <= 3) {
+		this.pelletColor = "#944";
+	} else if (this.dlvl >= 4 && this.dlvl <= 6) {
+		this.pelletColor = "rgb(216, 216, 252)";
+	} else if (this.dlvl >= 7 && this.dlvl <= 9) {
+		this.pelletColor = "#f00";
+	} else if (this.dlvl >= 10 && this.dlvl <= 12) {
+		this.pelletColor = "#0ff";
+	} else if (this.dlvl >= 13) {
+		this.pelletColor = "rgb(216, 216, 252)";
 	}
 
-	I.draw = function() {
-		if (this.dark) {
-			// TODO: Implement Dark mode
-		} else {
-			for (var i=0; i<this.tiles.length; i++) {
-				if (this.tiles[i].draw) {
-					this.tiles[i].draw();
+	for (var row=0; row<TILE_ROWS; row++) {
+		this.tiles.push([]);
+		var yOffset = row * TILE_H + lvlPanel.rect.top;
+		for (var col=0; col<TILE_COLS; col++) {
+			var xOffset = col * TILE_W + lvlPanel.rect.left;
+			var rect = new gamejs.Rect([xOffset, yOffset], [TILE_W, TILE_H]);
+
+			var t = new tile.Tile(data[row][col], rect, this.wallColor, this.floorColor);
+			this.tiles[row].push(t);
+
+			switch (data[row][col]) {
+				// Ghosts
+				case 'B': case 'P': case 'I': case 'A': {
+					loadedLevel.gameObjects.push(new entities.Ghost([row, col], data[row][col]));
+					gamejs.info("Adding Ghost at index [" + row + ", " + col + "]");
+					break;
 				}
-			}
-			for (var i=0; i<this.entities.length; i++) {
-				if (this.entities[i].draw) {
-					this.entities[i].draw();
+				case '@': {
+					loadedLevel.gameObjects.push(new entities.Player([row, col]));
+					gamejs.info("Adding Player at index [" + row + ", " + col + "]");
+					break;
+				}
+				case '.': {
+					loadedLevel.gameObjects.push(new entities.Pellet([row, col], '.'));
+					break;
+				}
+				case 'o': {
+					loadedLevel.gameObjects.push(new entities.Pellet([row, col], 'o'));
+					break;
+				}
+				default: {
+					// Do nothing, handled by Tile
+					break;
 				}
 			}
 		}
 	}
-
-	return I;
 };
 

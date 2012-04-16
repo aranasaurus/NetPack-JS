@@ -1,77 +1,116 @@
 var font = require("gamejs/font");
 
-var Player = exports.Player = function(I) {
-	var I = I || {};
+var GameObject = exports.GameObject = function(tileIndex, txt, color) {
+	this.tileIndex = tileIndex || [0, 0];
+	this.txt = txt || "";
+	this.color = color || "";
 
-	I.rect = I.rect || new gamejs.Rect([0, 0], [TILE_W, TILE_H]);
-	I.color = I.color || "yellow";
-	var fontString = (TILE_H) + "px Courier";
-	I.font = I.font || new font.Font(fontString);
-	I.canMove = true;
-	
-	I.draw = function() {
-		ctx.blit(this.font.render("@", this.color), this.rect);
-	};
+	var fontString = (TILE_H * 2) + "px Courier";
+	this.font = new font.Font(fontString);
 
-	I.update = function() {
-	};
+	return this;
+}
 
-	I.move_or_attack = function(dx, dy) {
-		this.moved = false;
-		if (this.canMove) {
-			this.rect.moveIp(dx, dy);
-			this.moved = true;
-		}
-	};
-
-	return I;
+GameObject.prototype.draw = function() {
+	ctx.blit(this.font.render(this.txt, this.color), this.rect);
 };
 
-var Ghost = exports.Ghost = function(I) {
-	var I = I || {};
+GameObject.prototype.updateRect = function() {
+	var tileRect = loadedLevel.getRect(this.tileIndex);
+	var left = tileRect.left + PLAYER_PADDING[0];
+	var top = tileRect.top + PLAYER_PADDING[1];
+	var width = tileRect.width - (PLAYER_PADDING[0] * 2);
+	var height = tileRect.height - (PLAYER_PADDING[1] * 2);
 
-	I.name = I.name || "Anne";
-	I.rect = I.rect || new gamejs.Rect([0, 0], [TILE_W, TILE_H]);
-	var fontString = (TILE_H) + "px Courier";
-	I.font = I.font || new font.Font(fontString);
-	I.color = "white";
-
-	I.draw = function() {
-		switch(this.name) {
-			case "B": {
-				I.color = "red";
-				break;
-			}
-			case "P": {
-				I.color = "pink";
-				break;
-			}
-			case "I": {
-				I.color = "blue";
-				break;
-			}
-			case "A": {
-				I.color = "orange";
-				break;
-			}
-		}
-		ctx.blit(this.font.render(this.name, this.color), this.rect);
-	};
-
-	return I;
+	this.rect = new gamejs.Rect([left, top], [width, height]);
 };
 
-var Pellet = exports.Pellet = function(I) {
-	var I = I || {
-		pos: [0,0],
-		isPowerPellet: false
-	};
+var Player = exports.Player = function(tileIndex, proto) {
+	this.tileIndex = tileIndex;
+	this.txt = "@";
+	this.color = "yellow";
 
-	I.draw = function() {
-		var rad = this.isPowerPellet ? POWER_PELLET_RAD : PELLET_RAD;
-		var width = this.isPowerPellet ? POWER_PELLET_W : PELLET_W;
-		draw.circle(ctx, pelletColor, this.pos, rad, width);
+	this.canMove = true;
+
+	return this;
+};
+
+Player.prototype = new GameObject();
+
+Player.prototype.update = function() {
+	var events = gamejs.event.get();
+	events.forEach(function(event) {
+		if (event.type === gamejs.event.KEY_UP) {
+			switch (event.key) {
+				case gamejs.event.K_UP: case gamejs.event.K_k: case gamejs.event.K_w: {
+					gamejs.info("Attempting to move player Up");
+					break;
+				}
+				case gamejs.event.K_RIGHT: case gamejs.event.K_l: case gamejs.event.K_d: {
+					gamejs.info("Attempting to move player Right");
+					break;
+				}
+				case gamejs.event.K_DOWN: case gamejs.event.K_j: case gamejs.event.K_s: {
+					gamejs.info("Attempting to move player Down");
+					break;
+				}
+				case gamejs.event.K_LEFT: case gamejs.event.K_h: case gamejs.event.K_a: {
+					gamejs.info("Attempting to move player Left");
+					break;
+				}
+			}
+		}
+	});
+
+	this.updateRect();
+};
+
+var Ghost = exports.Ghost = function(tileIndex, txt) {
+	this.tileIndex = tileIndex;
+	this.txt = txt;
+
+	this.color = "white";
+	switch(txt) {
+		case "B": {
+			this.color = "red";
+			break;
+		}
+		case "P": {
+			this.color = "pink";
+			break;
+		}
+		case "I": {
+			this.color = "blue";
+			break;
+		}
+		case "A": {
+			this.color = "orange";
+			break;
+		}
 	}
 
-	return I;
+	return this;
 };
+
+Ghost.prototype = new GameObject();
+Ghost.prototype.update = function() {
+	// TODO: Ghost AI
+	this.updateRect();
+};
+
+var Pellet = exports.Pellet = function(tileIndex, txt) {
+	this.tileIndex = tileIndex;
+	this.txt = txt;
+	this.color = loadedLevel.pelletColor;
+	this.isPowerPellet = txt == 'o';
+
+	return this;
+};
+
+Pellet.prototype = new GameObject();
+Pellet.prototype.draw = function() {
+	var rad = this.isPowerPellet ? POWER_PELLET_RAD : PELLET_RAD;
+	var width = this.isPowerPellet ? POWER_PELLET_W : PELLET_W;
+	draw.circle(ctx, this.color, loadedLevel.getRect(this.tileIndex).center, rad, width);
+}
+

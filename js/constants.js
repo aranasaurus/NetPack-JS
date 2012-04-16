@@ -6,8 +6,11 @@ window.FRAME_W = 2;
 // Vertical padding between Panels
 window.V_PAD = 6;
 
+window.FPS = 25;
+
 // Set these two to an approximate size for the level area
-// the actual size will be calculated
+// the actual size will be calculated using the TILE_W/TILE_H and
+// TILE_COLS/TILE_ROWS
 var lvl_width_px = 400;
 var lvl_height_px = 400;
 // Number of tiles per Col/Row
@@ -38,4 +41,4 @@ window.POWER_PELLET_RAD = Math.ceil(TILE_W / 4);
 window.POWER_PELLET_W = 3;
 window.POWER_PELLET_VAL = 50;
 
-window.PLAYER_PADDING = [1, 3];
+window.PLAYER_PADDING = [2, 2];
