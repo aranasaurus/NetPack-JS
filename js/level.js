@@ -23,7 +23,11 @@ Level.prototype.getTile = function(xy) {
 	var col = (xy[0] - lvlPanel.left) / TILE_W;
 	var row = (xy[1] - lvlPanel.top) / TILE_H;
 
-	return this.tiles[row][col];
+	if (col < TILE_COLS && row < TILE_ROWS) {
+		return this.tiles[row][col];
+	} else {
+		return false;
+	}
 };
 
 Level.prototype.draw = function() {
@@ -68,20 +72,22 @@ Level.prototype.load = function(data) {
 			switch (data[row][col]) {
 				// Ghosts
 				case 'B': case 'P': case 'I': case 'A': {
+					gamejs.info("Adding Ghost (" + data[row][col] + ") at index [" + row + ", " + col + "]");
 					loadedLevel.gameObjects.push(new entities.Ghost([row, col], data[row][col]));
-					gamejs.info("Adding Ghost at index [" + row + ", " + col + "]");
 					break;
 				}
 				case '@': {
-					loadedLevel.gameObjects.push(new entities.Player([row, col]));
 					gamejs.info("Adding Player at index [" + row + ", " + col + "]");
+					loadedLevel.gameObjects.push(new entities.Player([row, col]));
 					break;
 				}
 				case '.': {
+					gamejs.info("Adding Pellet at index [" + row + ", " + col + "]");
 					loadedLevel.gameObjects.push(new entities.Pellet([row, col], '.'));
 					break;
 				}
 				case 'o': {
+					gamejs.info("Adding PowerPellet at index [" + row + ", " + col + "]");
 					loadedLevel.gameObjects.push(new entities.Pellet([row, col], 'o'));
 					break;
 				}

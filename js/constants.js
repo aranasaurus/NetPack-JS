@@ -37,7 +37,7 @@ window.MSG_W = LVL_W;
 window.PELLET_RAD = Math.ceil(TILE_W / 10);
 window.PELLET_W = 0;
 window.PELLET_VAL = 10;
-window.POWER_PELLET_RAD = Math.ceil(TILE_W / 4);
+window.POWER_PELLET_RAD = Math.ceil(TILE_W / 5);
 window.POWER_PELLET_W = 3;
 window.POWER_PELLET_VAL = 50;
 
