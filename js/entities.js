@@ -22,15 +22,15 @@ GameObject.prototype.move = function(dRow, dCol) {
 	var targetRow = this.tileIndex[ROW] + dRow;
 	var targetCol = this.tileIndex[COL] + dCol;
 	
+	// Check if we're on a warp tile and heading through the warp
+	// and adjust targetCol accordingly
 	if (loadedLevel.getTile(this).warp) {
 		if (this.tileIndex[COL] == 0 && dCol == -1) {
 			gamejs.info('{' + this.txt + '} Warping left to right');
-			this.tileIndex[COL] = TILE_COLS - 1;
-			this.moved = true;
+			targetCol = TILE_COLS - 1;
 		} else if (this.tileIndex[COL] == TILE_COLS - 1 && dCol == 1) {
 			gamejs.info('{' + this.txt + '} Warping right to left');
-			this.tileIndex[COL] = 0;
-			this.moved = true;
+			targetCol = 0;
 		}
 	}
 
