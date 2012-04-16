@@ -8,6 +8,7 @@ var GameObject = exports.GameObject = function(tileIndex, txt, color) {
 	var fontString = (TILE_H * 2) + "px Courier";
 	this.font = new font.Font(fontString);
 	
+	// Force refresh calc of rect
 	this.moved = true;
 
 	return this;
@@ -22,13 +23,12 @@ GameObject.prototype.move = function(dRow, dCol) {
 	var targetCol = this.tileIndex[COL] + dCol;
 	
 	if (loadedLevel.getTile(this).warp) {
-		gamejs.info('Warp time?');
 		if (this.tileIndex[COL] == 0 && dCol == -1) {
-			gamejs.info('Warping left to right');
+			gamejs.info('{' + this.txt + '} Warping left to right');
 			this.tileIndex[COL] = TILE_COLS - 1;
 			this.moved = true;
 		} else if (this.tileIndex[COL] == TILE_COLS - 1 && dCol == 1) {
-			gamejs.info('Warping right to left');
+			gamejs.info('{' + this.txt + '} Warping right to left');
 			this.tileIndex[COL] = 0;
 			this.moved = true;
 		}
@@ -44,7 +44,7 @@ GameObject.prototype.move = function(dRow, dCol) {
 	}
 
 	if (this.moved) {
-		gamejs.info(this.txt + " moved to [" + this.tileIndex[ROW] + ", " + this.tileIndex[COL] + "]");
+		gamejs.info('{' + this.txt + '} moved to [' + this.tileIndex[ROW] + ", " + this.tileIndex[COL] + "]");
 	}
 };
 
