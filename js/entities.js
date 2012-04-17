@@ -81,10 +81,31 @@ GameObject.prototype.updateRect = function() {
 };
 
 var Player = exports.Player = function(tileIndex, proto) {
-	this.tileIndex = tileIndex;
-	this.txt = "@";
-	this.color = "yellow";
-	this.score = 0;
+	var proto = proto || {};
+	this.tileIndex = proto.tileIndex || tileIndex;
+	this.txt = proto.txt || "@";
+	this.color = proto.color || "yellow";
+
+	this.score = proto.score || 0;
+	this.levelUpScore = proto.levelUpScore || this.score;
+	this.ghostsEaten = proto.ghostsEaten || 0;
+	this.xp = proto.xp || 0;
+	this.nextLevelXp = proto.xp || 50;
+	this.hp = proto.hp || PLAYER_MAX_HP;
+	this.lives = proto.lives || 3;
+	this.level = proto.level || 1;
+
+	this.attackDice = proto.attackDice || [1, 6];
+	this.defenseDice = proto.defenseDice || [1, 4];
+	this.attackBonus = proto.attackBonus || 0;
+	this.defenseBonus = proto.defenseBonus || 0;
+	this.attackBase = proto.attackBase || 8;
+	this.attackCap = proto.attackCap || 12;
+	this.defenseBase = proto.defenseBase || 8;
+	this.defenseCap = proto.defenseCap || 12;
+
+	this.inventory = proto.inventory || [];
+	this.itemsInUse = proto.itemsInUse || [];
 
 	return this;
 };
@@ -143,6 +164,11 @@ Player.prototype.update = function() {
 
 Player.prototype.eat = function(pellet) {
 	this.score += pellet.points;
+	if (this.hp < PLAYER_MAX_HP) {
+		this.hp = Math.min(this.hp + Math.floor(PLAYER_MAX_HP / 30) + 1, PLAYER_MAX_HP);
+	} else {
+		this.xp++;
+	}
 	this.log('Eating a '+ (pellet.isPowerPellet ? 'Power' : '') + 'Pellet. ' +
 			 '[score: ' + this.score + ']');
 	loadedLevel.removePellet(pellet);

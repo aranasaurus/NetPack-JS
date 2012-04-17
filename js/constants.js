@@ -46,3 +46,4 @@ window.POWER_PELLET_W = 3;
 window.POWER_PELLET_VAL = 50;
 
 window.PLAYER_PADDING = [2, 2];
+window.PLAYER_MAX_HP = 10;
