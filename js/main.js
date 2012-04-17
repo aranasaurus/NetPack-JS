@@ -21,15 +21,24 @@ gamejs.ready(function() {
     function tick(msDuration) {
 
 		// Update stuff
-		loadedLevel.gameObjects.forEach(function(entity) {
-			if (entity.update) {
-				entity.update();
-			}
-		});
+		var _update = function(o) {
+			o.update();
+		};
+		loadedLevel.ghosts.forEach(_update);
+		loadedLevel.items.forEach(_update);
+		loadedLevel.player.update();
 
 		// Draw stuff
     	ctx.fill("#000");
-    	drawPanels();
+		lvlPanel.draw();
+		loadedLevel.draw();
+		statusPanel.draw();
+		msgPanel.draw();
+
+		ctx.blit(statusTxt, [statusPanel.rect.center[0] - (statusTxt.rect.width/2),
+				 statusPanel.rect.center[1] - (statusTxt.rect.height/2)]);
+		ctx.blit(msgTxt, [msgPanel.rect.center[0] - (msgTxt.rect.width/2),
+				 msgPanel.rect.center[1] - (msgTxt.rect.height/2)]);
     };
 
     function init() {
@@ -63,18 +72,6 @@ gamejs.ready(function() {
 		loadedLevel.load(level_7_9);
 
 		gamejs.time.fpsCallback(tick, this, FPS);
-	};
-
-	function drawPanels() {
-		lvlPanel.draw();
-		loadedLevel.draw();
-		statusPanel.draw();
-		msgPanel.draw();
-
-		ctx.blit(statusTxt, [statusPanel.rect.center[0] - (statusTxt.rect.width/2),
-				 statusPanel.rect.center[1] - (statusTxt.rect.height/2)]);
-		ctx.blit(msgTxt, [msgPanel.rect.center[0] - (msgTxt.rect.width/2),
-				 msgPanel.rect.center[1] - (msgTxt.rect.height/2)]);
 	};
 
     init();

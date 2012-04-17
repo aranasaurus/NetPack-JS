@@ -6,7 +6,9 @@ var Level = exports.Level = function() {
 	this.dlvl = 0;
 	this.sublvl = 0;
 	this.tiles = [];
-	this.gameObjects = [];
+	this.ghosts = [];
+	this.pellets = [];
+	this.items = [];
 	this.wallColor = "#00f";
 	this.floorColor = "#000";
 	this.dark = false;
@@ -25,6 +27,34 @@ Level.prototype.getTile = function(entityOrTileIndex) {
 	return this.tiles[tileIndex[ROW]][tileIndex[COL]];
 };
 
+Level._getObject = function(row, col, arr) {
+	for (var i=0; i<arr.length; i++) {
+		var o = arr[i];
+		if (o.tileIndex[ROW] == row && o.tileIndex[COL] == col) {
+			return o;
+		}
+	}
+	return false;
+};
+
+Level.prototype.getGhost = function(row, col) {
+	return Level._getObject(row, col, this.ghosts);
+};
+
+Level.prototype.getPellet = function(row, col) {
+	return Level._getObject(row, col, this.pellets);
+};
+
+Level.prototype.getItem = function(row, col) {
+	return Level._getObject(row, col, this.items);
+};
+
+Level.prototype.removePellet = function(pellet) {
+	var i = this.pellets.indexOf(pellet);
+	gamejs.info('Removing pellet[' + i + '] from pellets');
+	this.pellets.splice(i, 1);
+}
+
 Level.prototype.getTileAtXY = function(xy) {
 	var col = (xy[0] - lvlPanel.left) / TILE_W;
 	var row = (xy[1] - lvlPanel.top) / TILE_H;
@@ -40,14 +70,16 @@ Level.prototype.draw = function() {
 	if (this.dark) {
 		// TODO: Implement Dark mode
 	} else {
+		var _draw = function(o) {
+			o.draw();
+		};
 		this.tiles.forEach(function(row) {
-			row.forEach(function(col) {
-				col.draw();
-			});
+			row.forEach(_draw);
 		});
-		this.gameObjects.forEach(function(entity) {
-			entity.draw();
-		});
+		this.pellets.forEach(_draw);
+		this.items.forEach(_draw);
+		this.ghosts.forEach(_draw);
+		this.player.draw();
 	}
 }
 
@@ -79,22 +111,22 @@ Level.prototype.load = function(data) {
 				// Ghosts
 				case 'B': case 'P': case 'I': case 'A': {
 					gamejs.info("Adding Ghost (" + data[row][col] + ") at index [" + row + ", " + col + "]");
-					loadedLevel.gameObjects.push(new entities.Ghost([row, col], data[row][col]));
+					this.ghosts.push(new entities.Ghost([row, col], data[row][col]));
 					break;
 				}
 				case '@': {
 					gamejs.info("Adding Player at index [" + row + ", " + col + "]");
-					loadedLevel.gameObjects.push(new entities.Player([row, col]));
+					this.player = new entities.Player([row, col]);
 					break;
 				}
 				case '.': {
 					gamejs.info("Adding Pellet at index [" + row + ", " + col + "]");
-					loadedLevel.gameObjects.push(new entities.Pellet([row, col], '.'));
+					this.pellets.push(new entities.Pellet([row, col], '.'));
 					break;
 				}
 				case 'o': {
 					gamejs.info("Adding PowerPellet at index [" + row + ", " + col + "]");
-					loadedLevel.gameObjects.push(new entities.Pellet([row, col], 'o'));
+					this.pellets.push(new entities.Pellet([row, col], 'o'));
 					break;
 				}
 				default: {

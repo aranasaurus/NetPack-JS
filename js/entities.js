@@ -18,6 +18,25 @@ GameObject.prototype.draw = function() {
 	ctx.blit(this.font.render(this.txt, this.color), this.rect);
 };
 
+GameObject.prototype.log = function(msg, lvl) {
+	var lvl = lvl || 0;
+	var msg = '{' + this.txt + '} ' + msg; 
+	switch (lvl) {
+		case 0:
+			gamejs.info(msg);
+		break;
+		case 1:
+			gamejs.warn(msg);
+		break;
+		case 2:
+			gamejs.error(msg);
+		break;
+		case 3:
+			gamejs.fatal(msg);
+		break;
+	}
+};
+
 GameObject.prototype.move = function(dRow, dCol) {
 	var targetRow = this.tileIndex[ROW] + dRow;
 	var targetCol = this.tileIndex[COL] + dCol;
@@ -26,10 +45,10 @@ GameObject.prototype.move = function(dRow, dCol) {
 	// and adjust targetCol accordingly
 	if (loadedLevel.getTile(this).warp) {
 		if (this.tileIndex[COL] == 0 && dCol == -1) {
-			gamejs.info('{' + this.txt + '} Warping left to right');
+			this.log('Warping left to right');
 			targetCol = TILE_COLS - 1;
 		} else if (this.tileIndex[COL] == TILE_COLS - 1 && dCol == 1) {
-			gamejs.info('{' + this.txt + '} Warping right to left');
+			this.log('Warping right to left');
 			targetCol = 0;
 		}
 	}
@@ -44,7 +63,7 @@ GameObject.prototype.move = function(dRow, dCol) {
 	}
 
 	if (this.moved) {
-		gamejs.info('{' + this.txt + '} moved to [' + this.tileIndex[ROW] + ", " + this.tileIndex[COL] + "]");
+		this.log('moved to [' + this.tileIndex[ROW] + ", " + this.tileIndex[COL] + "]");
 	}
 };
 
@@ -65,6 +84,7 @@ var Player = exports.Player = function(tileIndex, proto) {
 	this.tileIndex = tileIndex;
 	this.txt = "@";
 	this.color = "yellow";
+	this.score = 0;
 
 	return this;
 };
@@ -73,32 +93,60 @@ Player.prototype = new GameObject();
 
 Player.prototype.update = function() {
 	var events = gamejs.event.get();
-	var p = this;
+	var dRow = 0;
+	var dCol = 0;
 	events.forEach(function(event) {
 		if (event.type === gamejs.event.KEY_UP) {
 			switch (event.key) {
 				case gamejs.event.K_UP: case gamejs.event.K_k: case gamejs.event.K_w: {
-					p.move(-1, 0);
+					dRow = -1;
+					dCol = 0;
 					break;
 				}
 				case gamejs.event.K_RIGHT: case gamejs.event.K_l: case gamejs.event.K_d: {
-					p.move(0, 1);
+					dRow = 0;
+					dCol = 1;
 					break;
 				}
 				case gamejs.event.K_DOWN: case gamejs.event.K_j: case gamejs.event.K_s: {
-					p.move(1, 0);
+					dRow = 1;
+					dCol = 0;
 					break;
 				}
 				case gamejs.event.K_LEFT: case gamejs.event.K_h: case gamejs.event.K_a: {
-					p.move(0, -1);
+					dRow = 0;
+					dCol = -1;
 					break;
 				}
 			}
 		}
 	});
+	if (dRow != 0 || dCol != 0) {
+		var targetRow = this.tileIndex[ROW] + dRow;
+		var targetCol = this.tileIndex[COL] + dCol;
+
+		var ghost = loadedLevel.getGhost(targetRow, targetCol);
+		if (ghost) {
+			// TODO: ATTACK!!
+			this.log('Attacking {' + ghost.txt + '}');
+		} else {
+			var pellet = loadedLevel.getPellet(targetRow, targetCol);
+			if (pellet) {
+				this.eat(pellet);
+			}
+			this.move(dRow, dCol);
+		}
+	}
 
 	this.updateRect();
 };
+
+Player.prototype.eat = function(pellet) {
+	this.score += pellet.points;
+	this.log('Eating a '+ (pellet.isPowerPellet ? 'Power' : '') + 'Pellet. ' +
+			 '[score: ' + this.score + ']');
+	loadedLevel.removePellet(pellet);
+}
 
 var Ghost = exports.Ghost = function(tileIndex, txt) {
 	this.tileIndex = tileIndex;
@@ -138,6 +186,7 @@ var Pellet = exports.Pellet = function(tileIndex, txt) {
 	this.txt = txt;
 	this.color = loadedLevel.pelletColor;
 	this.isPowerPellet = txt == 'o';
+	this.points = this.isPowerPellet ? POWER_PELLET_VAL : PELLET_VAL;
 
 	return this;
 };
