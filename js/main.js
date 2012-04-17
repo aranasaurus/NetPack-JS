@@ -35,10 +35,15 @@ gamejs.ready(function() {
 		statusPanel.draw();
 		msgPanel.draw();
 
-		ctx.blit(statusTxt, [statusPanel.rect.center[0] - (statusTxt.rect.width/2),
-				 statusPanel.rect.center[1] - (statusTxt.rect.height/2)]);
-		ctx.blit(msgTxt, [msgPanel.rect.center[0] - (msgTxt.rect.width/2),
-				 msgPanel.rect.center[1] - (msgTxt.rect.height/2)]);
+		ctx.blit(statusTxt, [statusPanel.rect.center[0] - (statusTxt.rect.width/2), statusPanel.rect.center[1] - (statusTxt.rect.height/2)]);
+		ctx.blit(msgTxt, [msgPanel.rect.center[0] - (msgTxt.rect.width/2), msgPanel.rect.center[1] - (msgTxt.rect.height/2)]);
+
+		if (FPS != lastFPS) {
+			gamejs.info("Changing FPS from " + lastFPS + " to " + FPS);
+			gamejs.time.deleteCallback(tick, lastFPS);
+			gamejs.time.fpsCallback(tick, this, FPS);
+			lastFPS = FPS;
+		}
     };
 
     function init() {
@@ -71,6 +76,7 @@ gamejs.ready(function() {
 		window.loadedLevel = new level.Level();
 		loadedLevel.load(level_7_9);
 
+		window.lastFPS = FPS;
 		gamejs.time.fpsCallback(tick, this, FPS);
 	};
 
