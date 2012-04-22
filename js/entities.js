@@ -1,8 +1,10 @@
 var font = require("gamejs/font");
 
-var GameObject = exports.GameObject = function(tileIndex, txt, color) {
+var GameObject = exports.GameObject = function(tileIndex, txt, color, spec) {
+	var spec = spec || {};
 	this.tileIndex = tileIndex || [0, 0];
 	this.txt = txt || "";
+	this.name = spec.name || txt;
 	this.color = color || "";
 
 	var fontString = (TILE_H * 2) + "px Courier";
@@ -185,7 +187,7 @@ var Ghost = exports.Ghost = function(tileIndex, txt) {
 			break;
 		}
 		case "P": {
-			this.color = "pink";
+			this.color = "rgb(255, 130, 130)";
 			break;
 		}
 		case "I": {
