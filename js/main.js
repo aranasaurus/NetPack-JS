@@ -41,7 +41,7 @@ gamejs.ready(function() {
         // Write messages to game console
         f = new font.Font("14px Verdana");
         var y = msgPanel.rect.top + 2;
-        if (window.messages.length > 5) {
+        if (window.messages.length > 4) {
             window.messages = window.messages.slice(1);
         }
         window.messages.forEach(function(msg) {
