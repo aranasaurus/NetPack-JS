@@ -103,6 +103,7 @@ var Player = exports.Player = function(tileIndex, proto) {
     var proto = proto || {};
     this.tileIndex = proto.tileIndex || tileIndex;
     this.txt = proto.txt || "@";
+    this.name = proto.name || "You";
     this.color = proto.color || "yellow";
 
     this.score = proto.score || 0;
@@ -198,6 +199,9 @@ Player.prototype.attack = function(ghost) {
     var attackRoll = throwDice(this.attackDice) + this.attackBonus,
         defenseRoll = throwDice(ghost.defenseDice);
     var damage = attackRoll - defenseRoll;
+    this.log("Attacking: " + attackRoll);
+    ghost.log("Defending: " + defenseRoll);
+    var msg = "";
 
     if (damage > 0) {
         if (this.attackBonus > 0) {
@@ -205,14 +209,15 @@ Player.prototype.attack = function(ghost) {
             // in netpack.py +210-218 does.
         }
 
-        window.messages.push(this.txt + " attacked " + ghost.txt + " for " + damage + " damage.");
+        msg = this.name + " attacked " + ghost.name + " for " + damage + " damage.";
         ghost.takeDamage(damage);
 
         // TODO: Play sounds
     } else {
-        window.messages.push(this.txt + " attacked " + ghost.txt + ". But it had no effect.");
+        msg = this.name + " attacked " + ghost.name + ". But it had no effect.";
     }
-
+    window.messages.push(msg);
+    this.log(msg);
 };
 
 var Ghost = exports.Ghost = function(tileIndex, txt, proto) {
@@ -224,18 +229,22 @@ var Ghost = exports.Ghost = function(tileIndex, txt, proto) {
     this.color = "white";
     switch(txt) {
         case "B": {
+            this.name = "Blinky";
             this.color = "red";
             break;
         }
         case "P": {
+            this.name = "Pinky";
             this.color = "rgb(255, 130, 130)";
             break;
         }
         case "I": {
+            this.name = "Inky";
             this.color = "blue";
             break;
         }
         case "A": {
+            this.name = "Anne";
             this.color = "orange";
             break;
         }
