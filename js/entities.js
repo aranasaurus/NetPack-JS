@@ -1,5 +1,22 @@
 var font = require("gamejs/font");
 
+var throwDice = function(dice) {
+    /*
+     * Takes an array with the number of dice in the first element and the number of
+     * sides of said dice in the second element and returns a total from rolling 
+     * them.
+     */
+    var numberOfDice = dice[0],
+        sides = dice[1],
+        total = 0;
+
+    for (var roll=0; roll<numberOfDice; roll++) {
+        total += (Math.random() * (sides * 100)) % sides;
+    }
+
+    return Math.ceil(total);
+};
+
 var GameObject = exports.GameObject = function(tileIndex, txt, color, spec) {
     var spec = spec || {};
     this.tileIndex = tileIndex || [0, 0];
@@ -151,6 +168,7 @@ Player.prototype.update = function() {
         var ghost = loadedLevel.getGhost(targetRow, targetCol);
         if (ghost) {
             // TODO: ATTACK!!
+            this.attack(ghost);
             this.log('Attacking {' + ghost.txt + '}');
         } else {
             var pellet = loadedLevel.getPellet(targetRow, targetCol);
@@ -174,11 +192,34 @@ Player.prototype.eat = function(pellet) {
     this.log('Eating a '+ (pellet.isPowerPellet ? 'Power' : '') + 'Pellet. ' +
              '[score: ' + this.score + ']');
     loadedLevel.removePellet(pellet);
-}
+};
 
-var Ghost = exports.Ghost = function(tileIndex, txt) {
+Player.prototype.attack = function(ghost) {
+    var attackRoll = throwDice(this.attackDice) + this.attackBonus,
+        defenseRoll = throwDice(ghost.defenseDice);
+    var damage = attackRoll - defenseRoll;
+
+    if (damage > 0) {
+        if (this.attackBonus > 0) {
+            // TODO: Not sure what the CRACK! business that is done in this block
+            // in netpack.py +210-218 does.
+        }
+
+        window.messages.push(this.txt + " attacked " + ghost.txt + " for " + damage + " damage.");
+        ghost.takeDamage(damage);
+
+        // TODO: Play sounds
+    } else {
+        window.messages.push(this.txt + " attacked " + ghost.txt + ". But it had no effect.");
+    }
+
+};
+
+var Ghost = exports.Ghost = function(tileIndex, txt, proto) {
+    var proto = proto || {};
     this.tileIndex = tileIndex;
     this.txt = txt;
+    this.defenseDice = proto.defenseDice || [1, 4];
 
     this.color = "white";
     switch(txt) {
@@ -207,6 +248,9 @@ Ghost.prototype = new GameObject();
 Ghost.prototype.update = function() {
     // TODO: Ghost AI
     this.updateRect();
+};
+
+Ghost.prototype.takeDamage = function(damage) {
 };
 
 var Pellet = exports.Pellet = function(tileIndex, txt) {
