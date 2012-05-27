@@ -12,11 +12,12 @@ var entities = require('entities');
 gamejs.ready(function() {
     gamejs.setLogLevel(0);
 
-    // TODO: these 3 are a lil stinky... I may want to find a
+    // TODO: these 4 are a lil stinky... I may want to find a
     // cleaner way to do these. Especially the 2 frame ones.
     window.ctx = gamejs.display.setMode([SCREEN_W, SCREEN_H]);
     window.frameX = Math.floor((SCREEN_W - LVL_W) / 2);
     window.frameColor = "#fcfcfc";
+    window.messages = ["Game Messages will be printed here...", "and here too"];
 
     function tick(msDuration) {
 
@@ -36,7 +37,18 @@ gamejs.ready(function() {
         msgPanel.draw();
 
         ctx.blit(statusTxt, [statusPanel.rect.center[0] - (statusTxt.rect.width/2), statusPanel.rect.center[1] - (statusTxt.rect.height/2)]);
-        ctx.blit(msgTxt, [msgPanel.rect.center[0] - (msgTxt.rect.width/2), msgPanel.rect.center[1] - (msgTxt.rect.height/2)]);
+
+        // Write messages to game console
+        f = new font.Font("14px Verdana");
+        var y = msgPanel.rect.top + 2;
+        if (window.messages.length > 5) {
+            window.messages = window.messages.slice(1);
+        }
+        window.messages.forEach(function(msg) {
+            var msgTxt = f.render(msg, "#cccccc");
+            ctx.blit(msgTxt, [msgPanel.rect.left + 4, y]);
+            y += msgTxt.rect.height + 2;
+        });
 
         if (FPS != lastFPS) {
             gamejs.info("Changing FPS from " + lastFPS + " to " + FPS);
@@ -71,7 +83,6 @@ gamejs.ready(function() {
 
         f = new font.Font("14px Verdana");
         window.statusTxt = f.render("Status Text (HP/XP) goes here.", "#cccccc");
-        window.msgTxt = f.render("Game Messages will be printed here", "#cccccc");
 
         window.loadedLevel = new level.Level();
         loadedLevel.load(level_7_9);
