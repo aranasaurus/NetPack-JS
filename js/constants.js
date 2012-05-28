@@ -36,6 +36,7 @@ window.STATUS_W = LVL_W;
 // Message Panel Dimensions
 window.MSG_H = SCREEN_H - STATUS_H - LVL_H - (V_PAD * 4);
 window.MSG_W = LVL_W;
+window.MSG_LINES = 4;
 
 // Pellet Info
 window.PELLET_RAD = Math.ceil(TILE_W / 10);

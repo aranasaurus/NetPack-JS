@@ -17,7 +17,28 @@ gamejs.ready(function() {
     window.ctx = gamejs.display.setMode([SCREEN_W, SCREEN_H]);
     window.frameX = Math.floor((SCREEN_W - LVL_W) / 2);
     window.frameColor = "#fcfcfc";
-    window.messages = ["Game Messages will be printed here...", "and here too"];
+    window.messages = ["Game Messages will be printed here...", "and here too.", "Here's a really long message, hopefully printed on multiple lines and things"];
+
+    var wrap = function(txt, f) {
+        var words = txt.split(' ');
+        var lines = ["", ""];
+        var wrapped = false;
+        for (var w = 0; w < words.length; w++) {
+            var word = words[w];
+            if (wrapped || f.size(lines[0] + ' ' + word)[0] > (window.MSG_W - 8)) {
+                wrapped = true;
+                lines[1] = (lines[1] + ' ' + word).trim();
+            } else {
+                lines[0] = (lines[0] + ' ' + word).trim();
+            }
+        }
+        if (lines[1] == "") {
+            lines.splice(1);
+        } else {
+            lines[1] = '  ' + lines[1];
+        }
+        return lines;
+    };
 
     function tick(msDuration) {
 
@@ -40,11 +61,15 @@ gamejs.ready(function() {
 
         // Write messages to game console
         f = new font.Font("14px Verdana");
-        var y = msgPanel.rect.top + 2;
-        if (window.messages.length > 4) {
-            window.messages = window.messages.slice(1);
-        }
+        var actualMessages = []; 
         window.messages.forEach(function(msg) {
+            actualMessages = actualMessages.concat(wrap(msg, f));
+        });
+        while (actualMessages.length > window.MSG_LINES) {
+            actualMessages.shift();
+        }
+        var y = msgPanel.rect.top + 2;
+        actualMessages.forEach(function(msg) {
             var msgTxt = f.render(msg, "#cccccc");
             ctx.blit(msgTxt, [msgPanel.rect.left + 4, y]);
             y += msgTxt.rect.height + 2;
