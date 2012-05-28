@@ -17,21 +17,20 @@ gamejs.ready(function() {
     window.ctx = gamejs.display.setMode([SCREEN_W, SCREEN_H]);
     window.frameX = Math.floor((SCREEN_W - LVL_W) / 2);
     window.frameColor = "#fcfcfc";
-    window.messages = ["Game Messages will be printed here...", "and here too.", "Here's a really long message, hopefully printed on multiple lines and things"];
+    window.messages = ["Game Messages will be printed here...", "And here too.", "Here's a really long message, hopefully printed on multiple lines and things"];
 
     var wrap = function(txt, f) {
         var words = txt.split(' ');
         var lines = ["", ""];
         var wrapped = false;
-        for (var w = 0; w < words.length; w++) {
-            var word = words[w];
+        words.forEach(function(word) {
             if (wrapped || f.size(lines[0] + ' ' + word)[0] > (window.MSG_W - 8)) {
                 wrapped = true;
                 lines[1] = (lines[1] + ' ' + word).trim();
             } else {
                 lines[0] = (lines[0] + ' ' + word).trim();
             }
-        }
+        });
         if (lines[1] == "") {
             lines.splice(1);
         } else {
