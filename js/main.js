@@ -24,7 +24,7 @@ gamejs.ready(function() {
         var lines = ["", ""];
         var wrapped = false;
         words.forEach(function(word) {
-            if (wrapped || f.size(lines[0] + ' ' + word)[0] > (window.MSG_W - 8)) {
+            if (wrapped || f.size(lines[0] + ' ' + word)[0] > (window.MSG_W - (window.MSG_PADDING * 2))) {
                 wrapped = true;
                 lines[1] = (lines[1] + ' ' + word).trim();
             } else {
@@ -70,7 +70,7 @@ gamejs.ready(function() {
         var y = msgPanel.rect.top + 2;
         actualMessages.forEach(function(msg) {
             var msgTxt = f.render(msg, "#cccccc");
-            ctx.blit(msgTxt, [msgPanel.rect.left + 4, y]);
+            ctx.blit(msgTxt, [msgPanel.rect.left + window.MSG_PADDING, y]);
             y += msgTxt.rect.height + 2;
         });
 
