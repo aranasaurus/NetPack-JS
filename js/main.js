@@ -17,13 +17,9 @@ gamejs.ready(function() {
     window.ctx = gamejs.display.setMode([SCREEN_W, SCREEN_H]);
     window.frameX = Math.floor((SCREEN_W - LVL_W) / 2);
     window.frameColor = "#fcfcfc";
-    window.messages = {
-        "Game Messages will be printed here...": "#cccccc",
-        "And here too.": "#cccccc",
-        "Here's a really long message, hopefully printed on multiple lines and things": "#cccccc"
-    };
+    window.messages = [];
     window.message = function(msg, color) {
-        window.messages[msg] = color;
+        window.messages.push([msg, color]);
         gamejs.info(msg + " [" + color + "]");
     };
 
@@ -70,17 +66,14 @@ gamejs.ready(function() {
         f = new font.Font("14px Verdana");
         var actualMessageLines = [];
         var actualMessageColors = {};
-        for (var k in window.messages) {
-            if (window.messages.hasOwnProperty(k)) {
-                var wrapped = wrap(k, f);
-                wrapped.forEach(function(w) {
-                    actualMessageColors[w] = window.messages[k];
-                    actualMessageLines.push(w);
-                });
-            }
-        }
+        window.messages.forEach(function(m) {
+            var wrapped = wrap(m[0], f);
+            wrapped.forEach(function(w) {
+                actualMessageColors[w] = m[1];
+                actualMessageLines.push(w);
+            });
+        });
         while (actualMessageLines.length > window.MSG_LINES) {
-            delete actualMessageColors[actualMessageLines[0]];
             actualMessageLines.shift();
         }
         var y = msgPanel.rect.top + 2;
