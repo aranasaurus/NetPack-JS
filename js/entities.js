@@ -233,8 +233,7 @@ Player.prototype.attack = function(ghost) {
         msg = this.name + " attacked " + ghost.name + ". But it had no effect.";
         color = "grey";
     }
-    window.messages[msg] = color;
-    this.log(msg);
+    window.message(msg, color);
 };
 
 Player.prototype.addXP = function(points) {
@@ -284,13 +283,13 @@ Player.prototype.levelUp = function(leveledFromPoints) {
 
     // If the player levels up from points, don't reset exp or increase the exp needed for next level
     if (leveledFromPoints) {
-        window.messages["You scored " + formatNumber(window.LEVEL_UP_POINTS) + " points!"] = "yellow";
+        window.message("You scored " + formatNumber(window.LEVEL_UP_POINTS) + " points!", "yellow");
     } else {
         this.nextLevelXp = Math.ceil(this.nextLevelXp * 1.2);
         this.xp = 0;
     }
 
-    window.messages["You reached level " + this.level + "!"] = "yellow";
+    window.message("You reached level " + this.level + "!", "yellow");
     this.log("Leveled up! New stats: { \n" + 
              "  attackDice: [" + this.attackDice[0] + ", " + this.attackDice[1] + "], " + "\n" +
              "  defenseDice: [" + this.defenseDice[0] + ", " + this.defenseDice[1] + "], " + "\n" +

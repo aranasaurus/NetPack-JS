@@ -22,6 +22,10 @@ gamejs.ready(function() {
         "And here too.": "#cccccc",
         "Here's a really long message, hopefully printed on multiple lines and things": "#cccccc"
     };
+    window.message = function(msg, color) {
+        window.messages[msg] = color;
+        gamejs.info(msg + " [" + color + "]");
+    };
 
     var wrap = function(txt, f) {
         var words = txt.split(' ');
