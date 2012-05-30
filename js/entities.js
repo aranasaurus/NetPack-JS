@@ -214,6 +214,7 @@ Player.prototype.attack = function(ghost) {
     this.log("Attacking: " + attackRoll);
     ghost.log("Defending: " + defenseRoll);
     var msg = "";
+    var color = "";
 
     if (damage > 0) {
         if (this.attackBonus > 0) {
@@ -223,14 +224,16 @@ Player.prototype.attack = function(ghost) {
             // Answer: Looks like it has to do with the Pretzel Whip item.
         }
 
-        msg = this.name + " attacked " + ghost.name + " for " + damage + " damage."; // Blue
+        msg = this.name + " attacked " + ghost.name + " for " + damage + " damage.";
+        color = "skyblue";
         ghost.takeDamage(damage);
 
         // TODO: Play sounds
     } else {
-        msg = this.name + " attacked " + ghost.name + ". But it had no effect."; // Light Grey
+        msg = this.name + " attacked " + ghost.name + ". But it had no effect.";
+        color = "grey";
     }
-    window.messages.push(msg);
+    window.messages[msg] = color;
     this.log(msg);
 };
 
@@ -281,13 +284,13 @@ Player.prototype.levelUp = function(leveledFromPoints) {
 
     // If the player levels up from points, don't reset exp or increase the exp needed for next level
     if (leveledFromPoints) {
-        window.messages.push("You scored " + formatNumber(window.LEVEL_UP_POINTS) + " points!"); // Yellow
+        window.messages["You scored " + formatNumber(window.LEVEL_UP_POINTS) + " points!"] = "yellow";
     } else {
         this.nextLevelXp = Math.ceil(this.nextLevelXp * 1.2);
         this.xp = 0;
     }
 
-    window.messages.push("You reached level " + this.level + "!"); // Yellow
+    window.messages["You reached level " + this.level + "!"] = "yellow";
     this.log("Leveled up! New stats: { \n" + 
              "  attackDice: [" + this.attackDice[0] + ", " + this.attackDice[1] + "], " + "\n" +
              "  defenseDice: [" + this.defenseDice[0] + ", " + this.defenseDice[1] + "], " + "\n" +

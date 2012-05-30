@@ -17,7 +17,11 @@ gamejs.ready(function() {
     window.ctx = gamejs.display.setMode([SCREEN_W, SCREEN_H]);
     window.frameX = Math.floor((SCREEN_W - LVL_W) / 2);
     window.frameColor = "#fcfcfc";
-    window.messages = ["Game Messages will be printed here...", "And here too.", "Here's a really long message, hopefully printed on multiple lines and things"];
+    window.messages = {
+        "Game Messages will be printed here...": "#cccccc",
+        "And here too.": "#cccccc",
+        "Here's a really long message, hopefully printed on multiple lines and things": "#cccccc"
+    };
 
     var wrap = function(txt, f) {
         var words = txt.split(' ');
@@ -60,16 +64,24 @@ gamejs.ready(function() {
 
         // Write messages to game console
         f = new font.Font("14px Verdana");
-        var actualMessages = []; 
-        window.messages.forEach(function(msg) {
-            actualMessages = actualMessages.concat(wrap(msg, f));
-        });
-        while (actualMessages.length > window.MSG_LINES) {
-            actualMessages.shift();
+        var actualMessageLines = [];
+        var actualMessageColors = {};
+        for (var k in window.messages) {
+            if (window.messages.hasOwnProperty(k)) {
+                var wrapped = wrap(k, f);
+                wrapped.forEach(function(w) {
+                    actualMessageColors[w] = window.messages[k];
+                    actualMessageLines.push(w);
+                });
+            }
+        }
+        while (actualMessageLines.length > window.MSG_LINES) {
+            delete actualMessageColors[actualMessageLines[0]];
+            actualMessageLines.shift();
         }
         var y = msgPanel.rect.top + 2;
-        actualMessages.forEach(function(msg) {
-            var msgTxt = f.render(msg, "#cccccc");
+        actualMessageLines.forEach(function(line) {
+            var msgTxt = f.render(line, actualMessageColors[line]);
             ctx.blit(msgTxt, [msgPanel.rect.left + window.MSG_PADDING, y]);
             y += msgTxt.rect.height + 2;
         });
