@@ -17,6 +17,19 @@ var throwDice = function(dice) {
     return Math.ceil(total);
 };
 
+var formatNumber = function(num) {
+    // convert to string
+    num += '';
+    var x = num.split('.');
+    var x1 = x[0];
+    var x2 = x.length > 1 ? '.' + x[1] : '';
+    var regx = /(\d+)(\d{3})/;
+    while (regx.test(x1)) {
+        x1 = x1.replace(regx, "$1" + "," + "$2");
+    }
+    return x1 + x2;
+}
+
 var GameObject = exports.GameObject = function(tileIndex, txt, color, spec) {
     var spec = spec || {};
     this.tileIndex = tileIndex || [0, 0];
@@ -108,10 +121,11 @@ var Player = exports.Player = function(tileIndex, proto) {
 
     this.score = proto.score || 0;
     this.levelUpScore = proto.levelUpScore || this.score;
-    this.ghostsEaten = proto.ghostsEaten || 0;
+    this.ghostsKilled = proto.ghostsKilled || 0;
     this.xp = proto.xp || 0;
     this.nextLevelXp = proto.xp || 50;
     this.hp = proto.hp || PLAYER_MAX_HP;
+    this.maxHP = proto.maxHP || PLAYER_MAX_HP;
     this.lives = proto.lives || 3;
     this.level = proto.level || 1;
 
@@ -167,10 +181,8 @@ Player.prototype.update = function() {
         var targetCol = this.tileIndex[COL] + dCol;
 
         var ghost = loadedLevel.getGhost(targetRow, targetCol);
-        if (ghost) {
-            // TODO: ATTACK!!
+        if (ghost && ghost.isAlive()) {
             this.attack(ghost);
-            this.log('Attacking {' + ghost.txt + '}');
         } else {
             var pellet = loadedLevel.getPellet(targetRow, targetCol);
             if (pellet) {
@@ -184,11 +196,11 @@ Player.prototype.update = function() {
 };
 
 Player.prototype.eat = function(pellet) {
-    this.score += pellet.points;
+    this.addScore(pellet.points);
     if (this.hp < PLAYER_MAX_HP) {
         this.hp = Math.min(this.hp + Math.floor(PLAYER_MAX_HP / 30) + 1, PLAYER_MAX_HP);
     } else {
-        this.xp++;
+        this.addXP(1);
     }
     this.log('Eating a '+ (pellet.isPowerPellet ? 'Power' : '') + 'Pellet. ' +
              '[score: ' + this.score + ']');
@@ -207,17 +219,82 @@ Player.prototype.attack = function(ghost) {
         if (this.attackBonus > 0) {
             // TODO: Not sure what the CRACK! business that is done in this block
             // in netpack.py +210-218 does.
+            //
+            // Answer: Looks like it has to do with the Pretzel Whip item.
         }
 
-        msg = this.name + " attacked " + ghost.name + " for " + damage + " damage.";
+        msg = this.name + " attacked " + ghost.name + " for " + damage + " damage."; // Blue
         ghost.takeDamage(damage);
 
         // TODO: Play sounds
     } else {
-        msg = this.name + " attacked " + ghost.name + ". But it had no effect.";
+        msg = this.name + " attacked " + ghost.name + ". But it had no effect."; // Light Grey
     }
     window.messages.push(msg);
     this.log(msg);
+};
+
+Player.prototype.addXP = function(points) {
+    this.xp += points;
+    if (this.xp >= this.nextLevelXp) {
+        this.levelUp(false);
+    }
+};
+
+Player.prototype.addScore = function(points) {
+    this.score += points;
+
+    if (this.levelUpScore + points >= window.LEVEL_UP_POINTS) {
+        this.levelUp(true);
+        this.levelUpScore += points - window.LEVEL_UP_POINTS;
+    } else {
+        this.levelUpScore += points;
+    }
+};
+
+Player.prototype.levelUp = function(leveledFromPoints) {
+    this.level++;
+
+    // Upgrade attack dice
+    var oldDice = this.attackDice;
+    if (oldDice[1] != this.attackCap) {
+        this.attackDice = [oldDice[0], oldDice[1] + 2];
+    } else {
+        this.attackDice = [oldDice[0] + 1, this.attackBase];
+        this.attackBase += 2;
+        this.attackCap += 2;
+    }
+
+    // Upgrade defense dice
+    oldDice = this.defenseDice;
+    if (oldDice[1] != this.defenseCap) {
+        this.defenseDice = [oldDice[0], oldDice[1] + 1];
+    }
+    else {
+        this.defenseDice = [oldDice[0] + 1, this.defenseBase];
+        this.defenseCap += 2;
+        this.defenseBase += 2;
+    }
+
+    // MOAR HPs
+    this.maxHP = Math.ceil(this.maxHP * 1.18);
+
+    // If the player levels up from points, don't reset exp or increase the exp needed for next level
+    if (leveledFromPoints) {
+        window.messages.push("You scored " + formatNumber(window.LEVEL_UP_POINTS) + " points!"); // Yellow
+    } else {
+        this.nextLevelXp = Math.ceil(this.nextLevelXp * 1.2);
+        this.xp = 0;
+    }
+
+    window.messages.push("You reached level " + this.level + "!"); // Yellow
+    this.log("Leveled up! New stats: { \n" + 
+             "  attackDice: [" + this.attackDice[0] + ", " + this.attackDice[1] + "], " + "\n" +
+             "  defenseDice: [" + this.defenseDice[0] + ", " + this.defenseDice[1] + "], " + "\n" +
+             "  maxHP: " + this.maxHP + ", " + "\n" +
+             "  xp: " + this.xp + "\n" + 
+             "}");
+    // TODO: Sounds!
 };
 
 var Ghost = exports.Ghost = function(tileIndex, txt, proto) {
@@ -225,6 +302,8 @@ var Ghost = exports.Ghost = function(tileIndex, txt, proto) {
     this.tileIndex = tileIndex;
     this.txt = txt;
     this.defenseDice = proto.defenseDice || [1, 4];
+    this.level = proto.level || 1;
+    this.hp = proto.hp || this.level * 8;
 
     this.color = "white";
     switch(txt) {
@@ -260,6 +339,21 @@ Ghost.prototype.update = function() {
 };
 
 Ghost.prototype.takeDamage = function(damage) {
+    this.hp = Math.max(0, this.hp - damage);
+    this.log("Took " + damage + " points of damage. Now has " + this.hp + " hp left.");
+
+    if (this.hp == 0) {
+        this.state = 'dead';
+        var player = window.loadedLevel.player;
+        player.ghostsKilled++;
+        player.addScore(window.KILL_POINTS);
+
+        // TODO: Sounds
+    }
+};
+
+Ghost.prototype.isAlive = function() {
+    return this.hp > 0;
 };
 
 var Pellet = exports.Pellet = function(tileIndex, txt) {

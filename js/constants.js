@@ -49,3 +49,6 @@ window.POWER_PELLET_VAL = 50;
 
 window.PLAYER_PADDING = [2, 2];
 window.PLAYER_MAX_HP = 10;
+
+window.KILL_POINTS = 600;
+window.LEVEL_UP_POINTS = 10000;
