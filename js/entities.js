@@ -213,8 +213,6 @@ Player.prototype.attack = function(ghost) {
     var damage = attackRoll - defenseRoll;
     this.log("Attacking: " + attackRoll);
     ghost.log("Defending: " + defenseRoll);
-    var msg = "";
-    var color = "";
 
     if (damage > 0) {
         if (this.attackBonus > 0) {
@@ -224,16 +222,13 @@ Player.prototype.attack = function(ghost) {
             // Answer: Looks like it has to do with the Pretzel Whip item.
         }
 
-        msg = this.name + " attacked " + ghost.name + " for " + damage + " damage.";
-        color = "skyblue";
+        window.message(this.name + " attacked " + ghost.name + " for " + damage + " damage.", "skyblue");
         ghost.takeDamage(damage);
 
         // TODO: Play sounds
     } else {
-        msg = this.name + " attacked " + ghost.name + ". But it had no effect.";
-        color = "grey";
+        window.message(this.name + " attacked " + ghost.name + ". But it had no effect.", "grey");
     }
-    window.message(msg, color);
 };
 
 Player.prototype.addXP = function(points) {
@@ -349,6 +344,9 @@ Ghost.prototype.takeDamage = function(damage) {
         var player = window.loadedLevel.player;
         player.ghostsKilled++;
         player.addScore(window.KILL_POINTS);
+        this.txt = "%%";
+        this.color = "red";
+        message("You vanquished " + this.name + "!", "red");
 
         // TODO: Sounds
     }
