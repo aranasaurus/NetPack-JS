@@ -1,41 +1,88 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>NetPack JS</title>
-<!-- Styling -->
+    <title>NetPack JS</title>
+    <!-- Styling -->
     <style type=text/css>
-        body{
-           background:#fff;
-           color:#222;
-           margin:1em 0 2em 1em;
-           padding:0;
+        body {
+            background: #000;
+            color: #fff;
         }
-        #gjs-loader {
-            width: 50%;
-            height: 50%;
-            background: url('./public/ajax-loader.gif');
+        div#container {
+            margin: 0 auto;
+            width: 600px;
+        }
+
+        div#scorePanel {
+            color: #fff;
+            text-transform: uppercase;
+            border: solid 1px #fff;
+            padding: 1em;
+            padding-bottom: 2em;
+        }
+
+        .levelContainer {
+            float: right;
+            margin-left: 1em;
+        }
+        .valueContainer {
+            float: left;
+            margin-right: 1em;
+        }
+
+        div#hpContainer {
+            background-color: rgb(200, 0, 0);
+        }
+        div#hpBar {
+            background-color: rgb(114, 114, 255);
+        }
+
+        div#xpContainer {
+            background-color: rgb(96, 0, 194);
+        }
+        div#xpBar {
+            background-color: rgb(187, 116, 255);
         }
     </style>
-<!-- Start javascript/main.js -->
-    <script src="./public/yabble.js"></script>
-    <script src="./public/gamejs.min.js"></script>
-	<script src="./js/maps.js"></script>
-	<script src="./js/constants.js"></script>
-    <script>
-        require.setModuleRoot('./js/');
-        require.run('main')
-    </script>
 </head>
-<!-- Html -->
 <body>
-    <div>
-        <div id="gjs-loader">
-         Loading...
+<div id="container">
+    <div id="scorePanel">
+        <div id="hpContainer">
+            <div id="hpBar">
+                <label id="hpLabel" for="hpText">HP:</label>
+                <span id="hpText"><span id="hpCurrent">100</span>/<span id="hpMax">100</span></span>
+            </div>
         </div>
-        <canvas id="gjs-canvas"></canvas>
-        <p>
-        Powered by <a href="http://gamejs.org">GameJs</a>.
-        </p>
+        <div id="xpContainer">
+            <div id="xpBar">
+                <label id="xpLabel" for="xpText">XP:</label>
+                <span id="xpText"><span id="xpCurrent">0</span>/<span id="xpMax">100</span></span>
+            </div>
+        </div>
+        <div id="statsContainer">
+            <span id="scoreContainer" class="valueContainer">
+                <label id="scoreLabel" for="scoreValue">SCORE:</label>
+                <span id="scoreValue">0</span>
+            </span>
+            <span id="livesContainer" class="valueContainer">
+                <label id="livesLabel" for="livesValue">LIVES:</label>
+                <span id="livesValue">3</span>
+            </span>
+            <span id="pLevelContainer" class="levelContainer">
+                <label id="pLevelLabel" for="pLevelValue">PLVL:</label>
+                <span id="pLevelValue">1</span>
+            </span>
+            <span id="dLevelContainer" class="levelContainer">
+                <label id="dLevelLabel" for="dLevelValue">DLVL:</label>
+                <span id="dLevelValue">1</span>
+            </span>
+        </div>
     </div>
+    <div id="gamePanel"></div>
+    <div id="consolePanel">
+        <ul id="console"></ul>
+    </div>
+</div>
 </body>
 </html>
