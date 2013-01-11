@@ -1,0 +1,42 @@
+body {
+    background: #000;
+    color: #fff;
+}
+div#container {
+    margin: 0 auto;
+    width: 600px;
+}
+
+div.panel {
+    border: solid 1px #fff;
+    padding: 1em;
+    margin: 1em inherit;
+}
+div#scorePanel {
+    color: #fff;
+    text-transform: uppercase;
+    padding-bottom: 2em;
+}
+
+div#scorePanel .levelContainer {
+    float: right;
+    margin-left: 1em;
+}
+div#scorePanel .valueContainer {
+    float: left;
+    margin-right: 1em;
+}
+
+div#hpContainer {
+    background-color: rgb(200, 0, 0);
+}
+div#hpBar {
+    background-color: rgb(114, 114, 255);
+}
+
+div#xpContainer {
+    background-color: rgb(96, 0, 194);
+}
+div#xpBar {
+    background-color: rgb(187, 116, 255);
+}
