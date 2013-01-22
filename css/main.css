@@ -40,3 +40,12 @@ div#xpContainer {
 div#xpBar {
     background-color: rgb(187, 116, 255);
 }
+
+#level td {
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+}
+#level td.wall {
+    background-color: blue;
+}
